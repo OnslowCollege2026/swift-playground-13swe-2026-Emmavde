@@ -8,6 +8,18 @@ struct SwiftPlayground {
         // These are the lunch costs for Monday to Friday.
         let lunches: [Double] = [6.50, 8.00, 5.75, 9.20, 7.10]
 
+        print("""
+
+        --------------------------
+        LUNCH SPENDING TRACKER:
+        --------------------------
+        """)
+
+        print("""
+
+        Daily lunch costs:
+        --------------------------
+        """)
         // Use a for loop to print the lunch cost for each day.
         for (index, cost) in lunches.enumerated() {
             print("Day \(index + 1): $\(cost)")
@@ -32,10 +44,34 @@ struct SwiftPlayground {
         } else {
             print("You stayed within budget.")
         }
+
+
+        print("""
+
+        -------------------------
+        """)
+        var snackTotal: Double = 0.0
+        // While loop that keeps adding snacks until snack spending reaches at least $10.
+        while snackTotal < 10  {
+            snackTotal += 2.5
+            print("Snack total: $\(snackTotal)")
+        }
+
+        // Print the final summary
+        print("""
+        
+        --------------------------------
+        FINAL SUMMARY:
+        --------------------------------
+        Lunch total: $\(totalLunchCost)
+        Snack total: $\(snackTotal)
+        Combined total: $\(totalLunchCost + snackTotal)
+        Average lunch cost: $\(averageCost(prices: lunches))
+
+        """)
+
     }
 }
-
-
 
 
 ///Total Cost Function
@@ -60,7 +96,6 @@ func isOverBudget(total: Double, budget: Double) -> Bool {
 /// 
 /// This should return the average lunch cost per day.
 func averageCost(prices: [Double]) -> Double {
-
     var sum: Double = 0
     for price in prices {
         sum += price
@@ -68,3 +103,6 @@ func averageCost(prices: [Double]) -> Double {
     return sum / Double(prices.count)
 }
 
+/// Most Expensive Day function
+/// 
+/// It should find the most expensive lunch cost.
