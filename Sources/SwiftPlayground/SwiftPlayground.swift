@@ -67,9 +67,8 @@ struct SwiftPlayground {
         Snack total: $\(snackTotal)
         Combined total: $\(totalLunchCost + snackTotal)
         Average lunch cost: $\(averageCost(prices: lunches))
-
+        Most expensive lunch cost: $\(mostExpensiveDay(prices: lunches))
         """)
-
     }
 }
 
@@ -106,3 +105,10 @@ func averageCost(prices: [Double]) -> Double {
 /// Most Expensive Day function
 /// 
 /// It should find the most expensive lunch cost.
+func mostExpensiveDay(prices: [Double]) -> Double {
+    if let highestCost: Double = prices.max() {
+        return highestCost
+    } else {
+        return 0.0
+    }
+}
