@@ -7,25 +7,18 @@ struct SwiftPlayground {
     static func main() {
 
         // Task: Analysing student scores
-        // You are given an array of student scores out of 100. Use map, filter, and reduce to find the average score of students who passed.
-
-        // Complete these steps:
+        let scores = [45, 78, 89, 32, 50, 92, 67, 41, 99, 56]
 
         // Use map to curve the scores by adding 5 extra points to each student’s score.
         // Use filter to keep only the passing scores (50 or more).
+        let passingScores = scores.map{$0 + 5}.filter {$0 >= 50}
+
         // Use reduce to calculate the average score of the passing students.
-        // Use the following input:
+        let averageScore = passingScores.reduce(0) {($0 + $1)} / passingScores.count
+        print("\n Average passing score: \(averageScore)")
 
-        let scores = [45, 78, 89, 32, 50, 92, 67, 41, 99, 56]
 
-        let curvedScores = scores.map {$0 + 5}
-        print(curvedScores)
-        let passingScores = curvedScores.filter {$0 > 50}
-        print(passingScores)
-        let averageScore = passingScores.reduce(0) {($0 + $1)/passingScores.count}
-
-        print(averageScore)
-        print("---------------")
+        print("------------------------")
 
 
         let numbers = [1, 2, 3, 4, 5]
@@ -80,18 +73,12 @@ struct SwiftPlayground {
         print(longWords)
 
 
-
-
-
         // Use reduce to find the longest word in an array. The initial value can be an empty string ("").
-        // You can find the length of a word with the .count property, which works like Python’s len().
-
         let words2 = ["apple", "banana", "grape", "strawberry", "kiwi"]
 
-        let longestWord = words2.reduce("") { result, word in
-            return word.count > result.count ? result : word
-        }
+        let longestWord = words2.reduce("") {
+        $1.count > $0.count ? $1 : $0}
 
         print(longestWord)
-    }
+}
 }
