@@ -68,7 +68,7 @@ struct SwiftPlayground {
         ]
 
 
-        let totalFIlteredScores = sightings.
+        let totalFilteredScores = sightings.filter {$0.name.hasPrefix("m") or $0.name.hasPrefix("w")}
     }
 }
 
