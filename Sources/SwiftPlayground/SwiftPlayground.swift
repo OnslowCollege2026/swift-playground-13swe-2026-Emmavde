@@ -2,122 +2,73 @@
 // https://docs.swift.org/swift-book
 import Foundation
 
-/// Formats a `Double` as currency with exactly two decimal places.
-/// - Parameter value: The numeric value to format.
-/// - Returns: A string like `$6.50`.
-func money(_ value: Double) -> String {
-    "$" + String(format: "%.2f", value)
-}
-
-
-///Total Cost Function
-///
-/// This should return the total cost of all lunches.
-func totalCost(prices: [Double]) -> Double {
-    var sum: Double = 0.0
-    for cost in prices {
-        sum += cost
-    }
-    return sum
-}
-
-/// Budget Check Function
-/// 
-/// This should return true if the student spent more than the budget.
-func isOverBudget(total: Double, budget: Double) -> Bool {
-    return total > budget
-}
-
-/// Average Cost Function
-/// 
-/// This should return the average lunch cost per day.
-func averageCost(prices: [Double]) -> Double {
-    var sum: Double = 0
-    for price in prices {
-        sum += price
-    }
-    return sum / Double(prices.count)
-}
-
-/// Most Expensive Day function
-/// 
-/// It should find the most expensive lunch cost.
-func mostExpensiveDay(prices: [Double]) -> Double {
-    if let highestCost: Double = prices.max() {
-        return highestCost
-    } else {
-        return 0.0
-    }
-}
-
 
 @main
 struct SwiftPlayground {
     static func main() {
 
-        // These are the lunch costs for Monday to Friday.
-        let lunches: [Double] = [6.50, 8.00, 5.75, 9.20, 7.10]
+        // Task A: hidden numbers
 
-        print("""
+        // You are given an array containing animal names and number strings.
+        let mixed = ["cat", "7", "owl", "15", "dog", "3"]
 
-        --------------------------
-        LUNCH SPENDING TRACKER:
-        --------------------------
-        """)
+        // Use compactMap to keep only the numbers and convert them to Int, then print the result.
+        let numbers = mixed.compactMap {Int($0)}
+        print(numbers)
 
-        print("""
-
-        Daily lunch costs:
-        --------------------------
-        """)
-        // Use a for loop to print the lunch cost for each day.
-        for (index, cost) in lunches.enumerated() {
-            print("Day \(index + 1): \(money(cost))")
-
-            // If any lunch costs more than $9.00, print:High spending day detected.
-            if cost > 9.0 {
-                print("High spending day detected.")
-            }
-        }
-
-        // Set a weekly budget:
-        let budget: Double = 35.00
-
-        // Calculate the total lunch cost:
-        let totalLunchCost: Double = totalCost(prices: lunches)
-
-        // If the student is over budget, print:Warning: You overspent this week.
-        if isOverBudget(total: totalLunchCost, budget: budget) {
-            print("Warning: You overspent this week.")
-        
-        // If the student is under budget, print:You stayed within budget.
-        } else {
-            print("You stayed within budget.")
-        }
+        // Then, as an alternative check, use allSatisfy on the original array to test if every item is a number string.
+        let allNumbers = mixed.allSatisfy {Int($0) != nil}
+        print(allNumbers)
 
 
-        print("""
 
-        -------------------------
-        """)
-        var snackTotal: Double = 0.0
-        // While loop that keeps adding snacks until snack spending reaches at least $10.
-        while snackTotal < 10  {
-            snackTotal += 2.5
-            print("Snack total: \(money(snackTotal))")
-        }
+        // Task B: the haunted archive
+        // The archive has wings, each wing has rooms, each room has shelves, and each shelf holds words.
 
-        // Print the final summary
-        print("""
-        
-        --------------------------------
-        FINAL SUMMARY:
-        --------------------------------
-        Lunch total: \(money(totalLunchCost))
-        Snack total: \(money(snackTotal))
-        Combined total: \(money(totalLunchCost + snackTotal))
-        Average lunch cost: \(money(averageCost(prices: lunches)))
-        Most expensive lunch cost: \(money(mostExpensiveDay(prices: lunches)))
-        """)
+        // Find the first item of the last item of the last item of the last item of the archive.
+
+        // Use first and last to solve the riddle, and print the final word.
+
+        let archive = [
+            [
+                [["candle", "dust"], ["mirror", "ash"]],
+                [["whisper", "shadow"], ["clock", "veil"]]
+            ],
+            [
+                [["stone", "key"], ["relic", "name"]],
+                [["cipher", "bone"], ["ember", "seal"]]
+            ]
+        ]
+
+        // let lastWing = archive.last
+        // print(lastWing)
+
+        // if let word = archive.last.last.first {
+        //                 print(word ?? "")
+        //                         }
+        // }
+
+
+
+        // Task C: the midnight filter
+        // You are given a list of sightings with a name and a danger score.
+
+        // Use filter to keep only sightings where the name starts with "m" or "w".
+
+        // Use map to extract the scores, then reduce to calculate the total.
+
+        // Finally, use min(by:) and max(by:) to find the lowest and highest scores in the filtered set.
+
+        let sightings = [
+            (name: "moth", score: 3),
+            (name: "wolf", score: 9),
+            (name: "raven", score: 4),
+            (name: "mist", score: 7),
+            (name: "wisp", score: 2)
+        ]
+
+
+        let totalFIlteredScores = sightings.
     }
 }
+
