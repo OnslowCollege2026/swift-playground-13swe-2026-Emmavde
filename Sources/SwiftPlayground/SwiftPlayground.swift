@@ -40,24 +40,11 @@ struct SwiftPlayground {
             ]
         ]
 
-        // let lastWing = archive.last
-        // print(lastWing)
-
-        // if let word = archive.last.last.first {
-        //                 print(word ?? "")
-        //                         }
-        // }
-
-
+        print(archive.last?.last?.last?.first ?? "")
+        
 
         // Task C: the midnight filter
         // You are given a list of sightings with a name and a danger score.
-
-        // Use filter to keep only sightings where the name starts with "m" or "w".
-
-        // Use map to extract the scores, then reduce to calculate the total.
-
-        // Finally, use min(by:) and max(by:) to find the lowest and highest scores in the filtered set.
 
         let sightings = [
             (name: "moth", score: 3),
@@ -67,8 +54,34 @@ struct SwiftPlayground {
             (name: "wisp", score: 2)
         ]
 
+        // Use filter to keep only sightings where the name starts with "m" or "w".
+        // Use map to extract the scores, then reduce to calculate the total.
 
-        let totalFilteredScores = sightings.filter {$0.name.hasPrefix("m") or $0.name.hasPrefix("w")}
+        let FilteredScores = sightings.filter {$0.name.hasPrefix("m") || $0.name.hasPrefix("w")}.map{$0.score}
+        let totalFilteredScores = FilteredScores.reduce(0){$0 + $1}
+
+        print("\nTotal danger score: \(totalFilteredScores)")
+
+        // Finally, use min(by:) and max(by:) to find the lowest and highest scores in the filtered set.
+        let lowestScore = FilteredScores.min{$0 < $1}
+        let highestScore = FilteredScores.max{$0 < $1}
+
+        print("lowest score: \(lowestScore ?? 0)")
+        print("Highest score: \(highestScore ?? 0)")
+
+
+        /// Create a function called accepts that takes a String and a closure parameter called isValid.
+        /// The closure should have the type (String) -> Bool and decide if the input passes.
+        /// Return true or false based on the closure.
+        func accepts(_ input: String, isValid: (String) -> Bool) -> Bool {
+            return isValid(input)
+        }
+
+        // Test your function with a predicate that only allows lowercase words and a predicate that only allows strings longer than 8 characters.
+        let sample = "moonlight"
+
+        print(accepts(sample) { $0 == $0.lowercased() })
+        print(accepts(sample) { $0.count > 8 })
     }
 }
 
