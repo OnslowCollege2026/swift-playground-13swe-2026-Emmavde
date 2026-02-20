@@ -136,9 +136,7 @@ struct SwiftPlayground {
 
         // Task D: quest board
         // Create a struct called Quest with properties title, difficulty, and reward.
-
         // Add a method printBadge() that prints a formatted line such as "Hard Quest - 50 XP".
-
         // Create three quest instances, call printBadge() for each, and determine which quest has the highest difficulty.
 
         struct Quest {
@@ -146,8 +144,8 @@ struct SwiftPlayground {
             var difficulty: Difficulty
             var reward: Int
 
-            func printBadge() -> String {
-                return "\(difficulty)"
+            func printBadge() {
+                print("\(difficulty) Quest - \(reward)XP")
             }
         }
 
@@ -157,6 +155,19 @@ struct SwiftPlayground {
             case hard = 3
         }
 
+        let quests: [Quest] = [
+            Quest(title: "Make garlic bread", difficulty: Difficulty.easy, reward: 20),
+            Quest(title: "Aquire Sword", difficulty: Difficulty.medium, reward: 50),
+            Quest(title: "Defeat dragon", difficulty: Difficulty.hard, reward: 100)
+        ]
+
+        for quest in quests {
+            quest.printBadge()
+        }
+
+        if let hardestQuest = (quests.max{$0.difficulty.rawValue < $1.difficulty.rawValue}) {
+            print("Most difficult quest: \(hardestQuest.title)")
+        }
     }
 }
 
