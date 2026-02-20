@@ -125,12 +125,13 @@ struct SwiftPlayground {
             Rectangle(width: 3, height: 19.5)
         ]
 
+        print()
         for (index, rectangle) in rectangles.enumerated() {
-            print()
             print("rectangle \(index + 1) area: \(rectangle.area())m²")
         }
 
         let largestArea = rectangles.max{$0.area() < $1.area()}?.area()
+        print()
         print("Largest area: \(largestArea ?? 0.0)m²")
 
 
@@ -167,6 +168,7 @@ struct SwiftPlayground {
         }
 
         if let hardestQuest = (quests.max{$0.difficulty.rawValue < $1.difficulty.rawValue}) {
+            print()
             print("Most difficult quest: \(hardestQuest.title)")
         }
     }
