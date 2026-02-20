@@ -145,7 +145,7 @@ struct SwiftPlayground {
             var reward: Int
 
             func printBadge() {
-                print("\(difficulty) Quest - \(reward)XP")
+                print("\(title): \(difficulty) Quest - \(reward)XP")
             }
         }
 
@@ -162,6 +162,7 @@ struct SwiftPlayground {
         ]
 
         for quest in quests {
+            print()
             quest.printBadge()
         }
 
