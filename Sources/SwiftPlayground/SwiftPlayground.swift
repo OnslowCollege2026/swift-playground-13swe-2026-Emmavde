@@ -68,8 +68,22 @@ struct Timer {
 // In comments, explain why addItem() and shippingMessage() are instance behaviour, while freeShippingThreshold and qualifiesForFreeShipping are type-level behaviour.
 
 struct Cart {
-    var itemsCOunt = 0
+    var itemsCount = 0
     let freeShippingThreshold = 5
+
+    mutating func addItem() {
+        itemsCount += 1
+    }
+
+    func shippingMessage() -> String {
+        if itemsCount >= freeShippingThreshold {
+            return "Free shipping"
+        } else { return "Shipping applies" }
+    }
+
+    let qualifiesForFreeShipping(count: Int) -> Bool {
+        itemsCount >= freeShippingThreshold 
+    }
 
 
 }
