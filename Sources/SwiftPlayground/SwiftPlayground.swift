@@ -55,7 +55,6 @@ struct Timer {
 
 }
 
-
 // Task D: mixed design decision
 // Build a struct Cart with property itemsCount starting at 0.
 // Add a type-level rule with static let freeShippingThreshold = 5.
@@ -67,6 +66,13 @@ struct Timer {
 // Create one Cart instance and call addItem() in a loop.
 // After each add, print both cart.itemsCount and cart.shippingMessage().
 // In comments, explain why addItem() and shippingMessage() are instance behaviour, while freeShippingThreshold and qualifiesForFreeShipping are type-level behaviour.
+
+struct Cart {
+    var itemsCOunt = 0
+    let freeShippingThreshold = 5
+
+
+}
 
 
 // Task E: method to computed property
