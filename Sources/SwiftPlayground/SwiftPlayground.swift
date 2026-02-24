@@ -79,6 +79,11 @@ struct SwiftPlayground {
         let longestWord = words2.reduce("") {
         $1.count > $0.count ? $1 : $0}
 
+
+        // let longestWord = words2.reduce("") {
+        //     return if $1.count > $0.count {$1} else {$0}
+        // }
+
         print(longestWord)
 }
 }
