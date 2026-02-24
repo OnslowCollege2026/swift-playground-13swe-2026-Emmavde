@@ -56,16 +56,6 @@ struct Timer {
 }
 
 // Task D: mixed design decision
-// Build a struct Cart with property itemsCount starting at 0.
-// Add a type-level rule with static let freeShippingThreshold = 5.
-// Add a mutating method addItem() that increments itemsCount by 1.
-// Add an instance method shippingMessage() -> String that uses itemsCount and returns:
-// "Free shipping" when itemsCount >= Cart.freeShippingThreshold
-// "Shipping applies" otherwise
-// Add a static helper qualifiesForFreeShipping(count: Int) -> Bool so the shipping rule can be reused in other places (for example previews, reports, or tests without a Cart instance).
-// Create one Cart instance and call addItem() in a loop.
-// After each add, print both cart.itemsCount and cart.shippingMessage().
-// In comments, explain why addItem() and shippingMessage() are instance behaviour, while freeShippingThreshold and qualifiesForFreeShipping are type-level behaviour.
 
 struct Cart {
     var itemsCount: Int = 0
