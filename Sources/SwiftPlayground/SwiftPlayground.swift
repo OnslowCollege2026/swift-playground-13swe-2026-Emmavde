@@ -57,8 +57,13 @@ struct SwiftPlayground {
         // Use filter to keep only sightings where the name starts with "m" or "w".
         // Use map to extract the scores, then reduce to calculate the total.
 
+        //$0.name.prefix(1) == "w"
+
         let FilteredScores = sightings.filter {$0.name.hasPrefix("m") || $0.name.hasPrefix("w")}.map{$0.score}
-        let totalFilteredScores = FilteredScores.reduce(0){$0 + $1}
+        let totalFilteredScores = FilteredScores.reduce(0, +)
+
+        // let totalFilteredScores = FilteredScores.reduce(0){$0 + $1}
+        // Product: .reduce(0, *)
 
         print("\nTotal danger score: \(totalFilteredScores)")
 
@@ -81,7 +86,9 @@ struct SwiftPlayground {
         let sample = "moonlight"
 
         print(accepts(sample) { $0 == $0.lowercased() })
+        // {$0.alllsatify {$0.isLowercase}}
         print(accepts(sample) { $0.count > 8 })
+        //
     }
 }
 
