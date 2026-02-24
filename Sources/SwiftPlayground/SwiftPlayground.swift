@@ -10,13 +10,15 @@ struct Book {
     let author: String
     let pages: Int
 
-    func summary() -> String {
-        return """
+    var summary: String {
+        """
         Title: \(title)
         Author: \(author)
         Pages: \(pages)
         """
     }
+
+    
 }
 
 // Task B: static method challenge
@@ -52,6 +54,9 @@ struct Timer {
         isRunning = false
     }
 
+    var summary: String {
+        "\(seconds) seconds"
+    }
 
 }
 
@@ -65,7 +70,7 @@ struct Cart {
         itemsCount += 1
     }
 
-    func shippingMessage() -> String {
+    var shippingMessage: String {
         if itemsCount >= freeShippingThreshold {
             return "Free shipping"
         } else { return "Shipping applies" }
@@ -103,7 +108,7 @@ struct SwiftPlayground {
         ]
 
         books.forEach() { book in
-        print(book.summary())
+        print(book.summary)
         print()
         }
 
@@ -125,7 +130,7 @@ struct SwiftPlayground {
         tenSecTimer.start()
 
         while tenSecTimer.seconds <= 10 {
-            print(tenSecTimer)
+            print(tenSecTimer.summary)
             tenSecTimer.tick()
         }
 
@@ -141,7 +146,7 @@ struct SwiftPlayground {
         while cart.itemsCount <= 10 {
             cart.addItem()
             print("\nItems in the cart: \(cart.itemsCount)")
-            print("Shipping status: \(cart.shippingMessage())")
+            print("Shipping status: \(cart.shippingMessage)")
         }
 
         // Task E: method to computed property
