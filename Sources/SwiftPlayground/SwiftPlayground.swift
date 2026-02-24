@@ -72,8 +72,8 @@ struct Cart {
 
     var shippingMessage: String {
         if itemsCount >= freeShippingThreshold {
-            return "Free shipping"
-        } else { return "Shipping applies" }
+            "Free shipping"
+        } else {"Shipping applies" }
     }
 
     func qualifiesForFreeShipping(count: Int) -> Bool {
