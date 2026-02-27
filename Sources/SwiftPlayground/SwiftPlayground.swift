@@ -107,8 +107,9 @@ struct SwiftPlayground {
         // Create two Students
         // Name: Jules, Age: 16
         // Name: Stan, Age: 17
-        let student1: Student = Student(id: 1234, name: "Jules", age: 16)
-        let student2: Student = Student(id: 5678, name: "Stan", age: 17)
+        let jules: Student = Student(id: 1234, name: "Jules", age: 16)
+        let stan: Student = Student(id: 5678, name: "Stan", age: 17)
+        let ash: Student = Student(id: 9123, name: "Ash", age: 18)
 
         // Create a Course
         // Title: 13SWE, Course Description: “Sweet Food in Hospitality”
@@ -119,9 +120,9 @@ struct SwiftPlayground {
         // Create another Enrolment: Enrol Stan again in 13SWE using a new Enrolment object
 
         let enrolmentsArray: [Enrolment] = [
-            Enrolment(studentId: 1234, courseID: 678),
-            Enrolment(studentId: 5678, courseID: 678),
-            Enrolment(studentId: 5678, courseID: 678)
+            Enrolment(studentId: jules.id, courseID: 678),
+            Enrolment(studentId: stan.id, courseID: 678),
+            Enrolment(studentId: stan.id, courseID: 678)
         ]
         // Add all enrolment objects to a Set and print out the Set Count
         let enrolmentsSet: Set<Enrolment> = Set(enrolmentsArray)
@@ -135,6 +136,16 @@ struct SwiftPlayground {
         // Create a new Student called Ash, Age 18, and create a ScoreEntry for Ash with 55 points
         // Compare Ash’s ScoreEntry with Jules’ ScoreEntry. Confirm equality using == and
         // print the result
+
+        let scores2: [ScoreEntry] = [
+            ScoreEntry(studentId: jules.id, points: 55),
+            ScoreEntry(studentId: stan.id, points: 50), 
+            ScoreEntry(studentId: ash.id, points: 55)
+        ]
+
+        print(scores2.sorted())
+        print(scores2.first{$0.studentId == jules.id} == scores2.first{$0.studentId == ash.id})
+
 
     }
 }
