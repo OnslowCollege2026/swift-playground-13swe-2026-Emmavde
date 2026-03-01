@@ -64,9 +64,6 @@ struct ScoreEntry: Comparable, Equatable {
     }
 }
 
-// Tasks - SchoolSystem Extension!
-// Update your program so that every struct conforms to more than one protocol. Keep the original protocol and add the following:
-
 // Student: CustomStringConvertible, Codable
 // Course: Identifiable, Equatable, Codable
 // Enrolment: Identifiable, Equatable, CustomStringConvertible
