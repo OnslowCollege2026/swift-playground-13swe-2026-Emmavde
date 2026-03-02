@@ -67,6 +67,12 @@ let rentals: [VideoRental] = [
                 dayIssued: 4, dayToReturn: 6,
                 wasReturned: true)
 ]
+
+/// Formats a Double as currency to 2dp.
+func money(_ value: Double) -> String {
+    "$" + String(format: "%.2f", value)
+}
+
 @main
 struct SwiftPlayground {
     static func main() {
@@ -92,9 +98,13 @@ struct SwiftPlayground {
         }
 
         for receipt in receiptList {
-            let customerName = customers.first(where: {$0.id == receipt.customerID})?.name
-            let videoTitle = videos.first(where: {$0.id == receipt.videoID})?.title
+            let customerName = customers.first(where: {$0.id == receipt.customerID})?.name ?? ""
+            let videoTitle = videos.first(where: {$0.id == receipt.videoID})?.title ?? ""
+            var overdue: String {
+                return if receipt.overdueFeeCharged {"yes"} else {"No"}
+            }
             
+            print("Receipt | Customer: \(customerName) | Video: \(videoTitle) | Base: \(money(receipt.pricePaid)) | Overdue: \(overdue)")
         }
     }
 }
