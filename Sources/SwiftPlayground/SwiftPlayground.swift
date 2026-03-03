@@ -29,6 +29,35 @@ struct Receipt {
     let overdueFeeCharged: Bool
 }
 
+// Create CustomerBill with the required fields and protocol conformances.
+// Properties: customer: Customer, receipt: Receipt — it accepts the actual objects as arguments, not just the ID
+// Protocol conformance: CustomStringConvertible, Equatable, Sortable
+struct CustomerBill: CustomStringConvertible, Equatable, Comparable {
+    var customer: Customer
+    var receipt: Receipt
+    var description: String {
+        """
+        Kia ora \(customer.name),
+
+        Our records show that \(videos.first(where: {$0.id == receipt.videoID})?.title ?? "") was overdue.
+        Base rental paid: \(money(receipt.pricePaid))
+        Overdue fee now due: \(money(overdueFee))
+
+        Please pay this amount at your earliest convenience.
+        Store Billing Team
+        """
+    }
+
+    static func == (lhs: CustomerBill, rhs: CustomerBill) -> Bool {
+        return (lhs.customer.name == lhs.customer.name)
+    }
+
+    static func < (lhs: CustomerBill, rhs: CustomerBill) -> Bool {
+            (lhs.receipt.pricePaid) + overdueFee < (rhs.receipt.pricePaid) + overdueFee
+    }
+}
+
+
 let videos: [Video] = [
     Video(id: UUID(), title: "The Matrix", dailyRate: 4.50),
     Video(id: UUID(), title: "Toy Story", dailyRate: 3.00),
@@ -68,6 +97,8 @@ let rentals: [VideoRental] = [
                 wasReturned: true)
 ]
 
+let overdueFee: Double = 2.0
+
 /// Formats a Double as currency to 2dp.
 func money(_ value: Double) -> String {
     "$" + String(format: "%.2f", value)
@@ -106,5 +137,38 @@ struct SwiftPlayground {
             
             print("Receipt | Customer: \(customerName) | Video: \(videoTitle) | Base: \(money(receipt.pricePaid)) | Overdue: \(overdue)")
         }
+
+        // Use filter to keep only receipts where overdueFeeCharged == true.
+        // Use a loop to print a mailing list in this format:
+        // Send overdue notice to: <customer name>, <address>
+
+        // Use the customers data (via customerID) to find addresses.
+
+        let overdueReceipts = receiptList.filter{$0.overdueFeeCharged}
+
+        for receipt in overdueReceipts {
+            let customerName: String = customers.first(where: {$0.id == receipt.customerID})?.name ?? ""
+            let address: String = customers.first(where: {$0.id == receipt.customerID})?.address ?? ""
+            print("Send overdue notice to: \(customerName), \(address)")
+        }
+
+        // Use reduce on the overdueReceipts array.
+        // Add $2.00 for each overdue receipt.
+        // Print the final total in this format:
+        // Total overdue fees collected: $<amount>
+
+        let totalFees: Double = overdueReceipts.reduce(0.0) { total, _ in total + overdueFee }
+        print("Total overdue fees collected: \(money(totalFees))")
+
+// Use map to convert overdue receipts into [CustomerBill].
+// Sort the bills array from highest fee to lowest using .sorted().reversed().
+// Print only the first bill to verify your description output.
+
+let customerBills: [CustomerBill] = overdueReceipts.map { receipt in 
+    CustomerBill(customer: Customer, receipt: Receipt)
+}
+
+
+
     }
 }
