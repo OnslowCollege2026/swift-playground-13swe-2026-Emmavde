@@ -160,15 +160,15 @@ struct SwiftPlayground {
         let totalFees: Double = overdueReceipts.reduce(0.0) { total, _ in total + overdueFee }
         print("Total overdue fees collected: \(money(totalFees))")
 
-// Use map to convert overdue receipts into [CustomerBill].
-// Sort the bills array from highest fee to lowest using .sorted().reversed().
-// Print only the first bill to verify your description output.
+        // Use map to convert overdue receipts into [CustomerBill].
+        // Sort the bills array from highest fee to lowest using .sorted().reversed().
+        // Print only the first bill to verify your description output.
 
-let customerBills: [CustomerBill] = overdueReceipts.map { receipt in 
-    CustomerBill(customer: Customer, receipt: Receipt)
-}
-
-
-
+        let customerBills: [CustomerBill] = overdueReceipts.compactMap { receipt in
+            guard let customer = customers.first(where: { $0.id == receipt.customerID }) else {
+                return nil
+            }
+            return CustomerBill(customer: customer, receipt: receipt)
+        }
     }
 }
