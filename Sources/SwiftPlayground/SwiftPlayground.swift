@@ -2,19 +2,19 @@
 // https://docs.swift.org/swift-book
 import Foundation
 
-struct Video: Identifiable {
+struct Video: Identifiable, Hashable, Codable {
     let id: UUID
     let title: String
     let dailyRate: Double
 }
 
-struct Customer: Identifiable {
+struct Customer: Identifiable, Hashable, Codable {
     let id: UUID
     let name: String
     let address: String
 }
 
-struct VideoRental {
+struct VideoRental: Hashable, Codable {
     let videoID: Video.ID
     let customerID: Customer.ID
     let dayIssued: Int
@@ -22,7 +22,7 @@ struct VideoRental {
     let wasReturned: Bool
 }
 
-struct Receipt {
+struct Receipt: Hashable, Codable {
     let videoID: Video.ID
     let customerID: Customer.ID
     let pricePaid: Double
@@ -32,12 +32,12 @@ struct Receipt {
 // Create CustomerBill with the required fields and protocol conformances.
 // Properties: customer: Customer, receipt: Receipt — it accepts the actual objects as arguments, not just the ID
 // Protocol conformance: CustomStringConvertible, Equatable, Sortable
-struct CustomerBill: CustomStringConvertible, Equatable, Comparable {
+struct CustomerBill: CustomStringConvertible, Equatable, Comparable, Hashable, Codable {
     var customer: Customer
     var receipt: Receipt
     var description: String {
         """
-        Kia ora \(customer.name),
+        \nKia ora \(customer.name),
 
         Our records show that \(videos.first(where: {$0.id == receipt.videoID})?.title ?? "") was overdue.
         Base rental paid: \(money(receipt.pricePaid))
@@ -45,6 +45,7 @@ struct CustomerBill: CustomStringConvertible, Equatable, Comparable {
 
         Please pay this amount at your earliest convenience.
         Store Billing Team
+
         """
     }
 
@@ -169,6 +170,31 @@ struct SwiftPlayground {
                 return nil
             }
             return CustomerBill(customer: customer, receipt: receipt)
-        }
+        } 
+
+        let sortedBills: [CustomerBill] = customerBills.sorted().reversed()
+        print(sortedBills[0])
+
+    // Add Hashable, Codable conformance to all five model types.
+    // Encode [CustomerBill] using JSONEncoder.
+    // Save to customer_bills.json.
+    // Read the file back and print it to confirm the JSON contains all bill data.
+
+    let encoder = JSONEncoder()
+encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+    do {
+        let data = try encoder.encode(customerBills)
+        let url = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent("customer_bills.json")
+
+        try data.write(to: url)
+        print("Saved JSON to: \(url.path)")
+
+        let readBack = try String(contentsOf: url, encoding: .utf8)
+        print(readBack)
+    } catch {
+        print("JSON save/load failed: \(error)")
+    }
     }
 }
