@@ -6,6 +6,8 @@ import Foundation
 
 // Create a Student that conforms to Identifiable
 // Properties: id, name, age
+
+
 struct Student: Identifiable {
     let id: Int
     var name: String
@@ -15,6 +17,13 @@ struct Student: Identifiable {
 // Create a Course that conforms to CustomStringConvertible
 // Properties: id, title, courseDescription
 // Description should print a readable summary line
+
+/// A course offered to students at the school.
+///
+/// Properties:
+/// - id: the course's unique identifier.
+/// - title: the full name of the course.
+/// - course Description: the details of the course.
 struct Course: CustomStringConvertible {
     let id: Int
     var title: String
@@ -30,6 +39,12 @@ struct Course: CustomStringConvertible {
 // Create an Enrolment that conforms to Codable
 // Properties: studentId, courseId
 // Encode one submission with JSONEncoder and decode it with JSONDecoder to make sure it works
+
+/// A student's enrolment in the course.
+///
+/// Properties:
+/// - studentid: the unique ID of the student.
+/// - courseid: the unique ID of the course.
 struct Enrolment: Codable, Hashable {
     let studentId: Int
     let courseID: Int
@@ -40,8 +55,7 @@ struct Enrolment: Codable, Hashable {
     // Build a Set of Enrolments with duplicates and print the unique count
 
         func hash(into hasher: inout Hasher) {
-        hasher.combine(studentId)
-        hasher.combine(courseID)
+            hasher.combine("\(studentId) .\(courseId)")
     }
 }
 
