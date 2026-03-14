@@ -2,29 +2,29 @@
   {
     "customer" : {
       "address" : "8 Tui Avenue",
-      "id" : "0993C08F-455F-46D2-85A9-6F0C16A3F5EE",
+      "id" : "C987F1E8-43AA-420C-A20D-33F92A995E51",
       "name" : "Liam Patel"
     },
     "receipt" : {
-      "customerID" : "0993C08F-455F-46D2-85A9-6F0C16A3F5EE",
+      "customerID" : "C987F1E8-43AA-420C-A20D-33F92A995E51",
       "daysOverdue" : 4,
       "overdueFeeCharged" : true,
       "pricePaid" : 3,
-      "videoID" : "19E41585-D9DF-43B1-B53A-BC8E7F8060FC"
+      "videoID" : "60F20D60-CB9C-41B2-95DC-95772DF81B7D"
     }
   },
   {
     "customer" : {
       "address" : "3 Pukeko Lane",
-      "id" : "71FEC548-6A06-48B8-B051-BD311A8E51D6",
+      "id" : "CC4FF2FC-B3C6-4108-A235-05C15B93C0A7",
       "name" : "Noah Wiremu"
     },
     "receipt" : {
-      "customerID" : "71FEC548-6A06-48B8-B051-BD311A8E51D6",
+      "customerID" : "CC4FF2FC-B3C6-4108-A235-05C15B93C0A7",
       "daysOverdue" : 2,
       "overdueFeeCharged" : true,
       "pricePaid" : 5,
-      "videoID" : "113BD4AE-4EE8-4CDD-86FF-E8EFF99774DD"
+      "videoID" : "ED51B2BE-4190-487D-AC5C-AA6DE610FD53"
     }
   }
 ]
