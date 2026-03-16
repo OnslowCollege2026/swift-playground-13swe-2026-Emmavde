@@ -25,8 +25,8 @@ struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord {
     }
 }
 
-/// An item on the menu. 
-struct Item: Identifiable, Codable, FetchableRecord, PersistableRecord {
+/// An item on the menu.
+struct Item: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomStringConvertible {
     /// The item id.
     let id: Int
 
@@ -35,16 +35,20 @@ struct Item: Identifiable, Codable, FetchableRecord, PersistableRecord {
 
     // The price of the item.
     let price: Double
-    
+
     enum CodingKeys: String, CodingKey {
         case id = "ItemID"
         case name = "Name"
         case price = "Price"
     }
+
+    var description: String {
+        return "Item ID: \(id) | Item name: \(name) | Price: \(money(price))"
+    }
 }
 
 /// An order placed.
-struct order: Identifiable, Codable, FetchableRecord, PersistableRecord {
+struct Order: Identifiable, Codable, FetchableRecord, PersistableRecord {
     /// The order ID.
     let id: Int
 
@@ -60,11 +64,10 @@ struct order: Identifiable, Codable, FetchableRecord, PersistableRecord {
         case amount = "Amount"
     }
 
-
 }
 
 /// A single orderline
-struct orderLine: Codable, FetchableRecord, PersistableRecord {
+struct OrderLine: Codable, FetchableRecord, PersistableRecord {
     /// The order id from the orders table.
     let orderId: Int
 
@@ -73,10 +76,25 @@ struct orderLine: Codable, FetchableRecord, PersistableRecord {
 
     // The number of the item ordered.
     let quantity: Int
+
+        enum CodingKeys: String, CodingKey {
+        case orderId = "OrderID"
+        case itemId = "PurchaserID"
+        case quantity = "Quantity"
+    }
 }
 
+// Purhcaser IDs to use for testing in Task.
+let purchaserIds: [Int] = [
+    1, 62,
+]
 
-
+/// Formats a `Double` as currency with exactly two decimal places.
+/// - Parameter value: The numeric value to format.
+/// - Returns: A string like `$6.50`.
+func money(_ value: Double) -> String {
+    "$" + String(format: "%.2f", value)
+}
 
 @main
 struct SwiftPlayground {
@@ -86,21 +104,43 @@ struct SwiftPlayground {
             let dbQueue = try DatabaseQueue(path: dbPath)
             print("Database connection successful")
 
-
             try dbQueue.read { database in
-                // Dump the schema to make sure we are connected to the correct database file.
-                try database.dumpSchema()
-                // Find a customer at the window seat
-                let windowSitter = Purchaser.filter(key: [
-                    "ReservedTable": "Window Seat"
-                ])
-                print(windowSitter)
-            }
 
-        }catch{
+                // Dump the schema to make sure we are connected to the correct database file.
+                let schema = try database.dumpSchema()
+                print(schema)
+
+                // Fetch two Purchaser by ID
+                // Fetch one with a known ID value (check your .db file)
+                // Fetch one with a made-up ID value and handle the nil case.
+                for id in purchaserIds {
+                    let purchaser = try Purchaser.fetchOne(database, key: id)
+                    if let purchaser {
+                        print("Found purchaser: \(purchaser.name)")
+                    } else {
+                        print("No purchaser with id \(id)")
+                    }
+                }
+
+                // Fetch one Item and print its detail out. (Hint: make Item conform to CustomStringConvertible)
+                guard let item = try Item.fetchOne(database, key: 1) else {return} 
+                print(item.description)
+
+                // Fetch one Order and print out the Purchaser details related to that order.
+                guard let order = try Order.fetchOne(database, key: 1) else {return} 
+                guard let purchaser = try Purchaser.fetchOne(database, key: order.purchaserId) else {return}
+                print(purchaser)
+
+                // Fetch all of the OrderLines for a given Order.
+                // Update one line to change which item was purchased.
+                // Calculate the prices in Swift.
+                // Update the Order's amount value with the cost of all of the OrderLines.
+
+                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+                }
+
+        } catch {
             print(error)
         }
-
-
     }
 }
