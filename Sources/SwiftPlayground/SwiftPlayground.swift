@@ -69,18 +69,23 @@ struct Order: Identifiable, Codable, FetchableRecord, PersistableRecord {
 /// A single orderline
 struct OrderLine: Codable, FetchableRecord, PersistableRecord {
     /// The order id from the orders table.
-    let orderId: Int
+    var orderId: Int
 
     /// The ID of the item being purchased.
-    let itemId: Int
+    var itemId: Int
 
     // The number of the item ordered.
-    let quantity: Int
+    var quantity: Int
 
-        enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case orderId = "OrderID"
-        case itemId = "PurchaserID"
+        case itemId = "ItemID"
         case quantity = "Quantity"
+    }
+
+    enum Columns {
+                static let orderId = Column("OrderID")
+                        static let itemId = Column("ItemID")
     }
 }
 
@@ -123,24 +128,46 @@ struct SwiftPlayground {
                 }
 
                 // Fetch one Item and print its detail out. (Hint: make Item conform to CustomStringConvertible)
-                guard let item = try Item.fetchOne(database, key: 1) else {return} 
+                guard let item = try Item.fetchOne(database, key: 1) else { return }
                 print(item.description)
 
                 // Fetch one Order and print out the Purchaser details related to that order.
-                guard let order = try Order.fetchOne(database, key: 1) else {return} 
-                guard let purchaser = try Purchaser.fetchOne(database, key: order.purchaserId) else {return}
+                guard let order = try Order.fetchOne(database, key: 1) else { return }
+                guard let purchaser = try Purchaser.fetchOne(database, key: order.purchaserId)
+                else { return }
                 print(purchaser)
+            }
 
+
+            try dbQueue.write { database in
                 // Fetch all of the OrderLines for a given Order.
+                var orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+                print(orderlines)
+
+                guard var lineToUpdate = try OrderLine.filter(OrderLine.Columns.orderId == 1 && OrderLine.Columns.itemId == 2).fetchOne(database) else {return}
+                print(lineToUpdate)
+
                 // Update one line to change which item was purchased.
                 // Calculate the prices in Swift.
                 // Update the Order's amount value with the cost of all of the OrderLines.
-
-                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+                
+                if !orderlines.contains(where: {$0.itemId == 4 }) {
+                    lineToUpdate.itemId = 4
+                    try lineToUpdate.update(database)
                 }
+
+                var maybeExisting = OrderLine(orderId: lineToUpdate.orderId, itemId: 4, quantity: lineToUpdate.quantity)
+                try maybeExisting.save(database)
+
+                // for line in orderlines {
+                //     let itemPrice = Item.column
+                //     let priceTotal: Double =   * Double(line.quantity)
+                // }
+            }
 
         } catch {
             print(error)
         }
+
     }
 }
