@@ -4,7 +4,9 @@ import Foundation
 import GRDB
 
 /// A reservation at the cafe.
-struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord {
+struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomStringConvertible {
+    static let databaseTableName = "Purchaser"
+
     /// The purchaser ID.
     let id: Int
 
@@ -15,7 +17,11 @@ struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord {
     var count: Int
 
     /// The name of the reserved table.
-    var reservedTable: String
+    var reservedTable: String?
+
+    var description: String {
+        "Purchaser #\(id) \(name) has reserved \(reservedTable ?? "") for a party of \(count)"
+    }
 
     enum CodingKeys: String, CodingKey {
         case id = "PurchaserID"
@@ -27,6 +33,8 @@ struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord {
 
 /// An item on the menu.
 struct Item: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomStringConvertible {
+    static let databaseTableName = "Item"
+
     /// The item id.
     let id: Int
 
@@ -49,6 +57,8 @@ struct Item: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomSt
 
 /// An order placed.
 struct Order: Identifiable, Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "Order"
+
     /// The order ID.
     let id: Int
 
@@ -63,11 +73,12 @@ struct Order: Identifiable, Codable, FetchableRecord, PersistableRecord {
         case purchaserId = "PurchaserID"
         case amount = "Amount"
     }
-
 }
 
 /// A single orderline
 struct OrderLine: Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "OrderLine"
+
     /// The order id from the orders table.
     var orderId: Int
 
@@ -84,8 +95,8 @@ struct OrderLine: Codable, FetchableRecord, PersistableRecord {
     }
 
     enum Columns {
-                static let orderId = Column("OrderID")
-                        static let itemId = Column("ItemID")
+        static let orderId = Column("OrderID")
+        static let itemId = Column("ItemID")
     }
 }
 
@@ -105,6 +116,11 @@ func money(_ value: Double) -> String {
 struct SwiftPlayground {
     static func main() {
         let dbPath = "Sources/SwiftPlayground/cafe.db"
+
+    var orderLines: [OrderLine] = []
+    var total = 0.0
+    var item : Item? = nil
+    
         do {
             let dbQueue = try DatabaseQueue(path: dbPath)
             print("Database connection successful")
@@ -136,12 +152,38 @@ struct SwiftPlayground {
                 guard let purchaser = try Purchaser.fetchOne(database, key: order.purchaserId)
                 else { return }
                 print(purchaser)
+
+                // Fetch all of the OrderLines for a given Order.
+                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+
+                // For each order line, print their details and tally up the subtotal per line.
+                for line in orderlines {
+                    var orderString = ""
+
+                    if let item = try Item.fetchOne(database, id: line.itemId) {
+                        let subtotal = item.price * Double(line.quantity)
+                        total += subtotal
+                        orderString = orderString + "\(item)" 
+                        orderString = orderString + "subtotal: $\(item.price * Double(line.quantity))"
+                    }
+
+                    print(orderString)
+                }
+                
+                item = try Item.fetchOne(database, id: orderlines[0].itemId)
+
+            }
+
+            try dbQueue.write { db in 
+                if let item {
+                    orderlines[0].quantity = 5 
+                }
             }
 
 
             try dbQueue.write { database in
                 // Fetch all of the OrderLines for a given Order.
-                var orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
                 print(orderlines)
 
                 guard var lineToUpdate = try OrderLine.filter(OrderLine.Columns.orderId == 1 && OrderLine.Columns.itemId == 2).fetchOne(database) else {return}
