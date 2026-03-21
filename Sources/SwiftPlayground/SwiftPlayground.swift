@@ -4,7 +4,8 @@ import Foundation
 import GRDB
 
 /// A reservation at the cafe.
-struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomStringConvertible {
+struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord, CustomStringConvertible
+{
     static let databaseTableName = "Purchaser"
 
     /// The purchaser ID.
@@ -116,26 +117,23 @@ func money(_ value: Double) -> String {
 struct SwiftPlayground {
     static func main() {
         let dbPath = "Sources/SwiftPlayground/cafe.db"
+        guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
+            fatalError("Could not open database.")
+        }
 
-    var orderLines: [OrderLine] = []
-    var total = 0.0
-    var item : Item? = nil
-    
+        var orderLines: [OrderLine] = []
+        var total = 0.0
+        var item: Item? = nil
+
         do {
-            let dbQueue = try DatabaseQueue(path: dbPath)
-            print("Database connection successful")
-
-            try dbQueue.read { database in
-
-                // Dump the schema to make sure we are connected to the correct database file.
-                let schema = try database.dumpSchema()
-                print(schema)
+            try dbQueue.read { db in
+                try db.dumpSchema()
 
                 // Fetch two Purchaser by ID
                 // Fetch one with a known ID value (check your .db file)
                 // Fetch one with a made-up ID value and handle the nil case.
                 for id in purchaserIds {
-                    let purchaser = try Purchaser.fetchOne(database, key: id)
+                    let purchaser = try Purchaser.fetchOne(db, key: id)
                     if let purchaser {
                         print("Found purchaser: \(purchaser.name)")
                     } else {
@@ -144,69 +142,49 @@ struct SwiftPlayground {
                 }
 
                 // Fetch one Item and print its detail out. (Hint: make Item conform to CustomStringConvertible)
-                guard let item = try Item.fetchOne(database, key: 1) else { return }
-                print(item.description)
+                guard let testItem = try Item.fetchOne(db, key: 1) else { return }
+                print(testItem.description)
 
                 // Fetch one Order and print out the Purchaser details related to that order.
-                guard let order = try Order.fetchOne(database, key: 1) else { return }
-                guard let purchaser = try Purchaser.fetchOne(database, key: order.purchaserId)
-                else { return }
-                print(purchaser)
+                if let order = try Order.fetchOne(db, key: 1),
+                    let purchaser = try Purchaser.fetchOne(db, key: order.purchaserId)
+                {
 
-                // Fetch all of the OrderLines for a given Order.
-                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
+                    print(purchaser.description)
 
-                // For each order line, print their details and tally up the subtotal per line.
-                for line in orderlines {
-                    var orderString = ""
+                    // Fetch all of the OrderLines for the given Order.
+                    let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == order.id)
+                        .fetchAll(db)
 
-                    if let item = try Item.fetchOne(database, id: line.itemId) {
-                        let subtotal = item.price * Double(line.quantity)
-                        total += subtotal
-                        orderString = orderString + "\(item)" 
-                        orderString = orderString + "subtotal: $\(item.price * Double(line.quantity))"
+                    // For each order line, print their details and tally up the subtotal per line.
+                    for line in orderlines {
+                        var orderString = ""
+
+                        if let item = try Item.fetchOne(db, id: line.itemId) {
+                            let subtotal = item.price * Double(line.quantity)
+                            total += subtotal
+                            orderString = orderString + "\(item)"
+                            orderString =
+                                orderString + "subtotal: $\(item.price * Double(line.quantity))"
+                        }
+
+                        print(orderString)
                     }
-
-                    print(orderString)
+                    item = try Item.fetchOne(db, id: orderlines[0].itemId)
                 }
-                
-                item = try Item.fetchOne(database, id: orderlines[0].itemId)
-
             }
 
-            try dbQueue.write { db in 
+            try dbQueue.write { db in
                 if let item {
-                    orderlines[0].quantity = 5 
+                    let newQuantity = 5
+                    orderLines[0].quantity = newQuantity
+                    let currentSubtotal = item.price * Double(orderLines[0].quantity)
+                    let newSubtotal = item.price * Double(newQuantity)
+                    total = total - currentSubtotal
+                    total = total + newSubtotal
+                    try orderLines[0].update(db)
                 }
             }
-
-
-            try dbQueue.write { database in
-                // Fetch all of the OrderLines for a given Order.
-                let orderlines = try OrderLine.filter(OrderLine.Columns.orderId == 1).fetchAll(database)
-                print(orderlines)
-
-                guard var lineToUpdate = try OrderLine.filter(OrderLine.Columns.orderId == 1 && OrderLine.Columns.itemId == 2).fetchOne(database) else {return}
-                print(lineToUpdate)
-
-                // Update one line to change which item was purchased.
-                // Calculate the prices in Swift.
-                // Update the Order's amount value with the cost of all of the OrderLines.
-                
-                if !orderlines.contains(where: {$0.itemId == 4 }) {
-                    lineToUpdate.itemId = 4
-                    try lineToUpdate.update(database)
-                }
-
-                var maybeExisting = OrderLine(orderId: lineToUpdate.orderId, itemId: 4, quantity: lineToUpdate.quantity)
-                try maybeExisting.save(database)
-
-                // for line in orderlines {
-                //     let itemPrice = Item.column
-                //     let priceTotal: Double =   * Double(line.quantity)
-                // }
-            }
-
         } catch {
             print(error)
         }
