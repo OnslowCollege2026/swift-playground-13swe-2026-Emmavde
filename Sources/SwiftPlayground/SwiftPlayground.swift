@@ -165,7 +165,7 @@ struct SwiftPlayground {
                             total += subtotal
                             orderString = orderString + "\(item)"
                             orderString =
-                                orderString + "subtotal: $\(item.price * Double(line.quantity))"
+                                orderString + " subtotal: $\(item.price * Double(line.quantity))"
                         }
 
                         print(orderString)
