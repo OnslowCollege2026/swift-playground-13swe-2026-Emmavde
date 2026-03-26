@@ -24,12 +24,12 @@ struct Rank: Comparable, CustomStringConvertible {
     }
 
     static func from(amount: Double) -> Rank {
-        if amount >= 250 { return Rank(label: "F Tier", level: 0) }  // Should be S
-        if amount >= 100 { return Rank(label: "D Tier", level: 1) }  // Should be A
-        if amount >= 50 { return Rank(label: "C Tier", level: 2) }
-        if amount >= 25 { return Rank(label: "B Tier", level: 3) }
-        if amount >= 10 { return Rank(label: "A Tier", level: 4) }
-        return Rank(label: "S Tier", level: 5)  // Should be F
+        if amount >= 250 { return Rank(label: "S Tier", level: 5) }  // Should be S
+        if amount >= 100 { return Rank(label: "A Tier", level: 4) }  // Should be A
+        if amount >= 50 { return Rank(label: "B Tier", level: 3) }
+        if amount >= 25 { return Rank(label: "C Tier", level: 2) }
+        if amount >= 10 { return Rank(label: "D Tier", level: 1) }
+        return Rank(label: "F Tier", level: 0)  // Should be F
     }
 }
 
@@ -89,69 +89,45 @@ struct PartyOrganizer {
     }
 }
 
-// Input functions:
-func input(forString prompt: String) -> String? {
-    print(prompt, terminator: " ")
-    let userInput: String? = readLine()
-    return userInput
-}
-
-func input(forDouble prompt: String) -> Double? {
-    if let userInput = input(forString: prompt), let userNumber = Double(userInput) {
-        return userNumber
-    } else {
-        return nil
-    }
-}
-
-func input(forInt prompt: String) -> Int? {
-    if let userInput = input(forString: prompt), let intInput = Int(userInput) {
-        return intInput
-    } else {
-        return nil
-    }
-}
-
 @main
-struct SwiftPlayground {
-    static func main() {
-        var app = PartyOrganizer()
-        app.addPreMadeGuests()
-        var isRunning = true
+    struct SwiftPlayground {
+        static func main() {
+            var app = PartyOrganizer()
+            app.addPreMadeGuests()
+            var isRunning = true
 
-        while isRunning {
-            var name: String = ""
-            var nameLooping = true
-
-            while nameLooping {
-                if let nameInput = input(forString: "\nEnter Name (or 'done'): "), nameInput != "" {
-                    nameLooping = false
-                    name = nameInput
-
+            while isRunning {
+                print("\nEnter Name (or 'done'): ", terminator: "")
+                
+                guard let nameInput = readLine(), nameInput.count >= 1 else {
+                    print("Invalid name")
+                    continue
                 }
-                if name.lowercased() == "done" {
+
+                if nameInput.lowercased() == "done" {
                     isRunning = false
                     break
+                }
 
+                
+                var amountLooping = true
+
+                while amountLooping {
+                    print("Enter Amount: ", terminator: "")
+                    guard let amountInput = readLine(), let amount = Double(amountInput), amount >= 0 else {
+                        print("Invalid")
+                        continue
+                    }
+                    amountLooping = false
+                    
+                    let newGuest = Guest(name: nameInput, contribution: Contribution(amount: amount))
+                    app.guestList.append(newGuest)
+                    print("Added \(nameInput).")
                 }
 
             }
 
-            var amountLooping = true
-            var amount: Double = 0.0
-
-            while amountLooping {
-                if let amountInput = input(forDouble: "Enter Amount: "), amountInput >= 0 {
-                    amountLooping = false
-                    amount = amountInput
-                } else {print("Please enter a positive number value.")}
-            }
-
-            let newGuest = Guest(name: name, contribution: Contribution(amount: amount))
-            app.guestList.append(newGuest)
-            print("Added \(name).")
+            app.printTierList()
         }
-
-        app.printTierList()
     }
-}
+
