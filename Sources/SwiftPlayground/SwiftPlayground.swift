@@ -30,6 +30,11 @@ struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord, Cus
         case count = "Count"
         case reservedTable = "ReservedTable"
     }
+
+    /// 
+    static func fetchPurchaser (with minimumTableCount: Int) -> [Purchaser] {
+        
+    }
 }
 
 @main
