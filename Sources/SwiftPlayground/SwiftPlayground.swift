@@ -126,6 +126,7 @@ struct SwiftPlayground {
         var item: Item? = nil
 
         do {
+
             try dbQueue.read { db in
                 try db.dumpSchema()
 
@@ -178,9 +179,11 @@ struct SwiftPlayground {
             print(error)
         }
 
-        do {
-            try dbQueue.write { db in
-                if let item {
+        if let item {
+
+            do {
+                try dbQueue.write { db in
+
                     let newQuantity = 5
                     orderLines[0].quantity = newQuantity
                     let currentSubtotal = item.price * Double(orderLines[0].quantity)
@@ -189,10 +192,9 @@ struct SwiftPlayground {
                     total = total + newSubtotal
                     try orderLines[0].update(db)
                 }
+            } catch {
+                print(error)
             }
-        } catch {
-            print(error)
         }
-
     }
 }
