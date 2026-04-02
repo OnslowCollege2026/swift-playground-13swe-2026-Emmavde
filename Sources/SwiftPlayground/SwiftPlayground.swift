@@ -174,6 +174,11 @@ struct SwiftPlayground {
                 }
             }
 
+        } catch {
+            print(error)
+        }
+
+        do {
             try dbQueue.write { db in
                 if let item {
                     let newQuantity = 5
