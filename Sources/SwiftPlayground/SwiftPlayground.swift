@@ -40,20 +40,12 @@ struct Book: Identifiable, Codable, FetchableRecord, PersistableRecord {
     /// The Book's author.
     let author: String
 
-    /// Whether the book is avialable or not. 0 = false (not available), 1 = true (available)
-
-    // var available: Bool {
-    //     // return Loans.returned.at book ID !contains(0)
-    //     return 
-    // }
-
     enum CodingKeys: String, CodingKey {
         case id = "Book ID"
         case title = "Title"
         case author = "Author"
     }
 }
-
 
 /// A single loan record of a book.
 struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
@@ -106,10 +98,13 @@ struct SwiftPlayground {
     static func main() {
 
         // An array of all of the books in the library, both available and on loan.
-        var allBooks: [Book]? = nil
+        var allBooks: [Book] = []
 
         // An array of all of the members in the system.
-        var allMembers: [Borrower]? = nil
+        var allMembers: [Borrower] = []
+
+        // An array of all recorded loans.
+        var allLoans: [Loan] = []
 
         let dbPath = "./Sources/SwiftPlayground/library.db"
         guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
@@ -121,10 +116,14 @@ struct SwiftPlayground {
                 // try db.dumpSchema()
                 allBooks = try Book.fetchAll(db)
                 allMembers = try Borrower.fetchAll(db)
+                allLoans = try Loan.fetchAll(db)
+
             }
         } catch { print("Error: \(error)") }
 
-        print(allBooks)
-        print(allMembers)
+            for book in allBooks {
+                let available = !allLoans.contains {$0.bookId == book.id && $0.returned == 0}
+
+        }
     }
 }
