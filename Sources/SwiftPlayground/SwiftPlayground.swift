@@ -6,7 +6,7 @@
 import Foundation
 import GRDB
 
-/// A Borrower who takes out loans. 
+/// A Borrower who takes out loans.
 struct Borrower: Identifiable, Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "Borrower"
 
@@ -17,16 +17,17 @@ struct Borrower: Identifiable, Codable, FetchableRecord, PersistableRecord {
     let name: String
 
     /// The number of loans the borrower currently has out/unreturned.
-    let currentLoans: Int
+    // var currentLoans: Int {
+    //     return //
+    // }
 
     enum CodingKeys: String, CodingKey {
         case id = "Borrower ID"
         case name = "Name"
-        case currentLoans = "Current Loans"
     }
 }
 
-/// A book that can be loaned. 
+/// A book that can be loaned.
 struct Book: Identifiable, Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "Book"
 
@@ -41,20 +42,20 @@ struct Book: Identifiable, Codable, FetchableRecord, PersistableRecord {
 
     /// Whether the book is avialable or not. 0 = false (not available), 1 = true (available)
 
-    var available: Bool {
-        // return Loans.returned.at book ID !contains(0)
-        return false
-    }
-    
+    // var available: Bool {
+    //     // return Loans.returned.at book ID !contains(0)
+    //     return 
+    // }
+
     enum CodingKeys: String, CodingKey {
         case id = "Book ID"
         case title = "Title"
         case author = "Author"
-        // case available = "Available"
     }
 }
 
-/// A single loan record of a book. 
+
+/// A single loan record of a book.
 struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "Loan"
 
@@ -68,7 +69,7 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
     let bookId: Int
 
     /// The agreed number of days the book was loaned for.
-    let loanPeriod: Int 
+    let loanPeriod: Int
 
     /// Whether or not the book was returned. 0 = false (not returned), 1 = true (returned)
     let returned: Int
@@ -82,9 +83,34 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
     }
 }
 
+func showActions() {
+    print(
+        """
+        Choose an action from the menu:
+        ----------------------------------
+        1. View the book catalouge (see book availability).
+        2. add a book
+        3. delete a book (make permanantly unavaialble? add property/column (exsists))
+
+        4. Borrow a book. (add loan)
+        5. return a book. (change returned property of loan)
+
+        6. View borrowers list
+        7. Add a borrower
+        8. edit a borrower's details.
+        """)
+}
+
 @main
 struct SwiftPlayground {
     static func main() {
+
+        // An array of all of the books in the library, both available and on loan.
+        var allBooks: [Book]? = nil
+
+        // An array of all of the members in the system.
+        var allMembers: [Borrower]? = nil
+
         let dbPath = "./Sources/SwiftPlayground/library.db"
         guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
             fatalError("Could not open database.")
@@ -92,20 +118,13 @@ struct SwiftPlayground {
 
         do {
             try dbQueue.read { db in
-                try db.dumpSchema()
+                // try db.dumpSchema()
+                allBooks = try Book.fetchAll(db)
+                allMembers = try Borrower.fetchAll(db)
             }
-        } catch { print("Error dumping database schema") }
+        } catch { print("Error: \(error)") }
 
-
-
-
-        print("""
-        Library Borrowing system:
-        ----------------------------
-        Welcome to the library borrowing system. 
-        """)
-
-        print()
-
+        print(allBooks)
+        print(allMembers)
     }
 }
