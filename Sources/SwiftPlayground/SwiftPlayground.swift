@@ -18,7 +18,7 @@ struct Borrower: Identifiable {
 }
 
 /// A book that can be loaned.
-struct Book: Identifiable {
+struct Book: Identifiable, CustomStringConvertible {
 
     /// The Book ID.
     let id: Int
@@ -28,6 +28,10 @@ struct Book: Identifiable {
 
     /// The Book's author.
     let author: String
+
+    var description: String {
+        "ID: \(id) | Title: \(title) | Author: \(author)"
+    }
 
     ///
     ///
@@ -73,8 +77,22 @@ struct menuOption {
     let action: ()
 }
 
+/// Get user input in the from of a string.
+///
+/// - Parameter prompt: The prompt displayed to the user.
+/// - Returns: The string the user inputted.
+func input(forString prompt: String) -> String? {
+    print(prompt, terminator: " ")
+    let userInput: String? = readLine()
+    return userInput
+}
+
+func placeHolder() {
+    print("placehold func ran")
+}
+
 let actionOptions: [menuOption] = [
-    menuOption(optionNumber: 1, description: "View books", action: ()),
+    menuOption(optionNumber: 1, description: "View books", action: placeHolder()),
     menuOption(optionNumber: 2, description: "Add book", action: ()),
     menuOption(optionNumber: 3, description: "Delete book", action: ()),
     menuOption(optionNumber: 4, description: "Borrow book", action: ()),
@@ -127,10 +145,53 @@ func showActions() {
         print("\(option.optionNumber). \(option.description)")
     }
 }
+///
+/// - Parameters:
+///   - books:
+///   - loans:
+func viewBooks(books: [Book], loans: [Loan]) {
+    print(
+        """
+        A. View all books.
+        B. View available books.
+        """)
 
-func viewBooks() {
+    var looping: Bool = true
+    while looping {
+        if let optionInput: String = input(forString: "Please enter the option letter: ") {
 
+            for book in books {
+                var availability: String = ""
+
+                if book.isAvailable(book: book, loans: loans) {
+                    availability = "Available"
+                } else {
+                    availability = "Not Available"
+                }
+
+                if optionInput.lowercased() == "a" {
+                    
+                    looping = false
+                    print("\(book) - \(availability)")
+                } 
+
+                if optionInput.lowercased() == "b"
+                && books.filter({$0.isAvailable(book: book, loans: loans)}).contains(where: {$0.id == book.id}) {
+
+                    looping = false
+                    print("book")
+                } 
+
+
+
+            }
+        }
+
+    }
+        
 }
+    
+
 
 @main
 struct SwiftPlayground {
@@ -148,9 +209,10 @@ struct SwiftPlayground {
         var running: Bool = true
         while running {
             showActions()
-            print("\nEnter option number, or 'done' to finish.): ", terminator: "")
 
-            guard let optionInput: String = readLine()
+            guard
+                let optionInput: String = input(
+                    forString: "\nEnter option number, or 'done' to finish.): ")
             else {
                 print("Invalid input")
                 continue
@@ -162,10 +224,22 @@ struct SwiftPlayground {
 
             else {
                 if let optionNumber = Int(optionInput) {
-
+                    // if let option = actionOptions.first(where: {$0.optionNumber == optionNumber}) {
+                    //     option.action
+                    // }
+                    switch optionNumber {
+                    case 1: viewBooks(books: books, loans: loans)
+                    case 2: placeHolder()
+                    case 3: placeHolder()
+                    case 4: placeHolder()
+                    case 5: placeHolder()
+                    case 6: placeHolder()
+                    case 7: placeHolder()
+                    case 8: placeHolder()
+                    default: print("Invalid. Please enter a number or 'done'.")
+                    }
                 }
 
-                print("Invalid. Please enter a number or 'done'.")
             }
         }
     }
