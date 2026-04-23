@@ -7,29 +7,18 @@ import Foundation
 import GRDB
 
 /// A Borrower who takes out loans.
-struct Borrower: Identifiable, Codable, FetchableRecord, PersistableRecord {
+struct Borrower: Identifiable {
     static let databaseTableName = "Borrower"
 
     /// The Borrower ID.
     let id: Int
 
     /// The Borrower's name.
-    let name: String
-
-    /// The number of loans the borrower currently has out/unreturned.
-    // var currentLoans: Int {
-    //     return //
-    // }
-
-    enum CodingKeys: String, CodingKey {
-        case id = "Borrower ID"
-        case name = "Name"
-    }
+    var name: String
 }
 
 /// A book that can be loaned.
-struct Book: Identifiable, Codable, FetchableRecord, PersistableRecord {
-    static let databaseTableName = "Book"
+struct Book: Identifiable {
 
     /// The Book ID.
     let id: Int
@@ -40,15 +29,20 @@ struct Book: Identifiable, Codable, FetchableRecord, PersistableRecord {
     /// The Book's author.
     let author: String
 
-    enum CodingKeys: String, CodingKey {
-        case id = "Book ID"
-        case title = "Title"
-        case author = "Author"
+    ///
+    ///
+    /// - Parameters:
+    ///   - book:
+    ///   - loans:
+    /// - Returns:
+    func isAvailable(book: Book, loans: [Loan]) -> Bool {
+        !loans.contains(where: { $0.bookId == book.id && !$0.returned })
     }
+
 }
 
 /// A single loan record of a book.
-struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
+struct Loan: Identifiable {
     static let databaseTableName = "Loan"
 
     /// The Loan ID.
@@ -63,67 +57,116 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
     /// The agreed number of days the book was loaned for.
     let loanPeriod: Int
 
-    /// Whether or not the book was returned. 0 = false (not returned), 1 = true (returned)
-    let returned: Int
-
-    enum CodingKeys: String, CodingKey {
-        case id = "Loan ID"
-        case borrowerId = "Borrower ID"
-        case bookId = "Book ID"
-        case loanPeriod = "Loan Period"
-        case returned = "Returned"
-    }
+    /// Whether or not the book was returned.
+    var returned: Bool
 }
+
+/// A single option on the action menu option.
+struct menuOption {
+    // The option's number it is selected by.
+    let optionNumber: Int
+
+    // The description of what action it performs.
+    let description: String
+
+    // The function that option calls.
+    let action: ()
+}
+
+let actionOptions: [menuOption] = [
+    menuOption(optionNumber: 1, description: "View books", action: ()),
+    menuOption(optionNumber: 2, description: "Add book", action: ()),
+    menuOption(optionNumber: 3, description: "Delete book", action: ()),
+    menuOption(optionNumber: 4, description: "Borrow book", action: ()),
+    menuOption(optionNumber: 5, description: "return book", action: ()),
+    menuOption(optionNumber: 6, description: "View borrowers", action: ()),
+    menuOption(optionNumber: 7, description: "Add borrower", action: ()),
+    menuOption(optionNumber: 8, description: "Edit borrower", action: ()),
+]
+
+// Some books to add to the library for testing.
+let preSetBooks: [Book] = [
+    Book(id: 1, title: "1984", author: "George Orwell"),
+    Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew"),
+    Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien"),
+    Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen"),
+    Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle"),
+    Book(id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams"),
+    Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien"),
+    Book(id: 8, title: "Animal Farm", author: "George Orwell"),
+    Book(id: 9, title: "Holes", author: "Louis Sachar"),
+    Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu"),
+]
+
+// SOme borrower data to add to the library for testing.
+let preSetBorrowers: [Borrower] = [
+    Borrower(id: 1, name: "Alice Johnson"),
+    Borrower(id: 2, name: "Bo-Katan Kryze"),
+    Borrower(id: 3, name: "Charlotte Smith"),
+    Borrower(id: 4, name: "Daniel Lee"),
+    Borrower(id: 5, name: "Gamora"),
+    Borrower(id: 6, name: "Gandalf"),
+]
+
+// Some past loan data to add to the library for testing.
+let preSetLoans: [Loan] = [
+    Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
+    Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
+    Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
+    Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
+]
 
 func showActions() {
     print(
         """
+        \n------------------------------------
         Choose an action from the menu:
-        ----------------------------------
-        1. View the book catalouge (see book availability).
-        2. add a book
-        3. delete a book (make permanantly unavaialble? add property/column (exsists))
-
-        4. Borrow a book. (add loan)
-        5. return a book. (change returned property of loan)
-
-        6. View borrowers list
-        7. Add a borrower
-        8. edit a borrower's details.
+        ------------------------------------
         """)
+    for option in actionOptions {
+        print("\(option.optionNumber). \(option.description)")
+    }
+}
+
+func viewBooks() {
+
 }
 
 @main
 struct SwiftPlayground {
     static func main() {
 
-        // An array of all of the books in the library, both available and on loan.
-        var allBooks: [Book] = []
+        // All of the books, available and on loan, in the library.
+        var books: [Book] = preSetBooks
 
-        // An array of all of the members in the system.
-        var allMembers: [Borrower] = []
+        // All of the borrowers/members of the library
+        var borrowers: [Borrower] = preSetBorrowers
 
-        // An array of all recorded loans.
-        var allLoans: [Loan] = []
+        // All of the past loans from the library.
+        var loans: [Loan] = preSetLoans
 
-        let dbPath = "./Sources/SwiftPlayground/library.db"
-        guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
-            fatalError("Could not open database.")
-        }
+        var running: Bool = true
+        while running {
+            showActions()
+            print("\nEnter option number, or 'done' to finish.): ", terminator: "")
 
-        do {
-            try dbQueue.read { db in
-                // try db.dumpSchema()
-                allBooks = try Book.fetchAll(db)
-                allMembers = try Borrower.fetchAll(db)
-                allLoans = try Loan.fetchAll(db)
-
+            guard let optionInput: String = readLine()
+            else {
+                print("Invalid input")
+                continue
             }
-        } catch { print("Error: \(error)") }
 
-            for book in allBooks {
-                let available = !allLoans.contains {$0.bookId == book.id && $0.returned == 0}
+            if optionInput.lowercased() == "done" {
+                running = false
+            }
 
+            else {
+                if let optionNumber = Int(optionInput) {
+
+                }
+
+                print("Invalid. Please enter a number or 'done'.")
+            }
         }
     }
 }
