@@ -188,19 +188,32 @@ func addBooks(to books: inout [Book]) {
 
     let id = (books.map { $0.id }.max() ?? 0) + 1
 
-    let looping: Bool = true
+    var looping: Bool = true
 
     while looping {
-        if let title = input(forString: "Enter book title: "), title.count >= 1 {
-            if let author = input(forString: "Enter Author's name: "), author.count >= 1 {
 
-                let looping = false
+        guard let title = input(forString: "Enter book title: "), title.count >= 1 else {
+            print("Please enter a title.")
+            continue
+        }
+
+        guard let author = input(forString: "Enter Author's name: "), author.count >= 1 else {
+            print("Please enter an author.")
+            continue
+        }
+
+        looping = false
+
+        // if let title = input(forString: "Enter book title: "), title.count >= 1 {
+        //     if let author = input(forString: "Enter Author's name: "), author.count >= 1 {
+
+        //         looping = false
 
                 let newBook: Book = Book(id: id, title: title, author: author, exists: true)
                 books.append(newBook)
                 print("\(newBook) was added")
-            }
-        }
+        //     } else {continue}
+        // }
     } 
 }
 
