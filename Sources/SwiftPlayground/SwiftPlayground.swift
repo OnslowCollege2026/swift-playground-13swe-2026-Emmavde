@@ -19,6 +19,10 @@ struct Borrower: Identifiable, CustomStringConvertible {
     var description: String {
         "ID: \(id) | Name: \(name) "
     }
+
+    func currentLoans(loans: [Loan]) -> Int {
+        loans.reduce(0) {$0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0)}
+    }
 }
 
 /// A book that can be loaned.
@@ -91,9 +95,9 @@ func input(forString prompt: String) -> String? {
     return userInput
 }
 /// Get user input in the form of an integer.
-/// 
-/// - Parameter prompt: 
-/// - Returns: 
+///
+/// - Parameter prompt:
+/// - Returns:
 func input(forInt prompt: String) -> Int? {
     if let userInput = input(forString: prompt), let intInput = Int(userInput) {
         return intInput
@@ -102,7 +106,6 @@ func input(forInt prompt: String) -> Int? {
     }
 
 }
-
 
 /// Print the menu of user actions.
 func showActions() {
@@ -117,7 +120,7 @@ func showActions() {
     }
 }
 ///
-/// 
+///
 /// - Parameters:
 ///   - books:
 ///   - loans:
@@ -164,21 +167,22 @@ func viewBooks(books: [Book], loans: [Loan]) {
 
 }
 
-/// 
-/// - Parameter borrowers: 
-func viewBorrowers(borrowers: [Borrower]) {
+///
+/// - Parameter borrowers:
+func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
     print(
         """
         Borrowers list:
         ---------------------
         """)
     for borrower in borrowers {
-        print(borrower)
+        let currentLoans: Int = borrower.currentLoans(loans: loans)
+        print("\(borrower) | \(currentLoans) books on loan.")
     }
 }
 
-/// 
-/// - Parameter books: 
+///
+/// - Parameter books:
 func addBooks(to books: inout [Book]) {
     print(
         """
@@ -187,38 +191,36 @@ func addBooks(to books: inout [Book]) {
         """)
 
     let id = (books.map { $0.id }.max() ?? 0) + 1
+    var author: String = ""
+    var title: String = ""
 
-    var looping: Bool = true
-
-    while looping {
-
-        guard let title = input(forString: "Enter book title: "), title.count >= 1 else {
+    while true {
+        guard let titleInput = input(forString: "Enter book title: "), titleInput.count >= 1 else {
             print("Please enter a title.")
             continue
         }
+        title = titleInput
+        break
+    }
 
-        guard let author = input(forString: "Enter Author's name: "), author.count >= 1 else {
+    while true {
+        guard let authorInput = input(forString: "Enter Author's name: "), authorInput.count >= 1
+        else {
             print("Please enter an author.")
             continue
         }
+        author = authorInput
+        break
+    }
 
-        looping = false
+    let newBook: Book = Book(id: id, title: title, author: author, exists: true)
+    books.append(newBook)
+    print("\(newBook) was added")
 
-        // if let title = input(forString: "Enter book title: "), title.count >= 1 {
-        //     if let author = input(forString: "Enter Author's name: "), author.count >= 1 {
-
-        //         looping = false
-
-                let newBook: Book = Book(id: id, title: title, author: author, exists: true)
-                books.append(newBook)
-                print("\(newBook) was added")
-        //     } else {continue}
-        // }
-    } 
 }
 
-/// 
-/// - Parameter books: 
+///
+/// - Parameter books:
 func removeBook(from books: inout [Book]) {
     print(
         """
@@ -227,48 +229,113 @@ func removeBook(from books: inout [Book]) {
         """)
 
     while true {
-        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: ") else {
+        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: "),
+            idToRemove > 0
+        else {
             print("Please enter a valid ID number.\n")
             continue
         }
 
-        if var IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }) ) {
+        if var IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }))
+        {
             books[IndexToRemove].exists = false
             print("\(books[IndexToRemove]) has been removed from the library.")
 
-        } else{
+        } else {
             print("Book does not exist or has already been removed.")
-        } 
+        }
         return
     }
 }
 
-func borrowBook() {
-    print("borrowBook() ran.")
+func borrowBook(from books: [Book], to loans: inout [Loan], borrowers: [Borrower]) {
+    print("""
+    \nBorrow a book:
+    -------------------
+    """)
+
+    
 }
 
 func returnBook() {
     print("returnBook() ran.")
 }
 
-func addBorrower() {
-    print("addBorrower() ran.")
+func addBorrower(to borrowers: inout [Borrower]) {
+
+    print(
+        """
+        Register a borrower:
+        -----------------------
+        """)
+
+    let id = (borrowers.map { $0.id }.max() ?? 0) + 1
+    var name: String = ""
+
+    while true {
+        guard let nameInput = input(forString: "Enter the borrower's name: "), nameInput.count >= 1
+        else {
+            print("Please enter a name.")
+            continue
+        }
+        name = nameInput
+        break
+    }
+
+    let newBorrower: Borrower = Borrower(id: id, name: name)
+    borrowers.append(newBorrower)
+    print("\(newBorrower) was added")
+
 }
 
-func editBorrower() {
-    print("editBorrower() ran.")
+func editBorrower(from borrowers: inout [Borrower]) {
+    print(
+        """
+        Edit borrower details:
+        -------------------------
+        """)
+
+    var idToEdit: Int = 0
+
+    while true {
+        guard let idInput = input(forInt: "Enter the borrower's ID number: "), idInput > 0 else {
+            print("Please enter a valid ID number.\n")
+            continue
+        } 
+        idToEdit = idInput
+        break
+    }
+
+        if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
+            if let newName: String = input(forString: "Enter the borrower's updated name: ") {
+                borrowers[IndexToedit].name = newName
+            }
+        } else {
+            print("There is no borrower with that ID.")
+        }
+
 }
 
-// The different actions dispalyed in the option menu. 
+func searchBooks() {
+    print("searchBooks() ran")
+}
+
+func searchBorrowers() {
+    print("searchBorrowers() ran")
+}
+
+// The different actions dispalyed in the option menu.
 let actionOptions: [menuOption] = [
     menuOption(optionNumber: 1, description: "View books"),
-    menuOption(optionNumber: 2, description: "Add book"),
-    menuOption(optionNumber: 3, description: "Delete book"),
-    menuOption(optionNumber: 4, description: "Borrow book"),
-    menuOption(optionNumber: 5, description: "return book"),
+    menuOption(optionNumber: 2, description: "Add a book"),
+    menuOption(optionNumber: 3, description: "Remove a book"),
+    menuOption(optionNumber: 4, description: "Borrow a book"),
+    menuOption(optionNumber: 5, description: "return a book"),
     menuOption(optionNumber: 6, description: "View borrowers"),
-    menuOption(optionNumber: 7, description: "Add borrower"),
-    menuOption(optionNumber: 8, description: "Edit borrower")
+    menuOption(optionNumber: 7, description: "Register a borrower"),
+    menuOption(optionNumber: 8, description: "Edit a borrower's details"),
+    menuOption(optionNumber: 9, description: "Search books"),
+    menuOption(optionNumber: 10, description: "Search Borrowers"),
 ]
 
 // Some books to add to the library for testing.
@@ -278,7 +345,8 @@ let preSetBooks: [Book] = [
     Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
     Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
     Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
-    Book(id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
+    Book(
+        id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
     Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
     Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
     Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
@@ -341,13 +409,16 @@ struct SwiftPlayground {
                     case 3: removeBook(from: &books)
                     case 4: borrowBook()
                     case 5: returnBook()
-                    case 6: viewBorrowers(borrowers: borrowers)
-                    case 7: addBorrower()
-                    case 8: editBorrower()
+                    case 6: viewBorrowers(borrowers: borrowers, loans: loans)
+                    case 7: addBorrower(to: &borrowers)
+                    case 8: editBorrower(from: &borrowers)
+                    case 9: searchBooks()
+                    case 10: searchBorrowers()
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
                     }
-                } else {print("Invalid. Please enter a number from the menu, or 'done'.")}
-
+                } else {
+                    print("Invalid. Please enter a number from the menu, or 'done'.")
+                }
             }
         }
     }
