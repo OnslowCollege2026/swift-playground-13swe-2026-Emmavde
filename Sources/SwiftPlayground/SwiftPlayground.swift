@@ -21,7 +21,7 @@ struct Borrower: Identifiable, CustomStringConvertible {
     }
 
     func currentLoans(loans: [Loan]) -> Int {
-        loans.reduce(0) {$0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0)}
+        loans.reduce(0) { $0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0) }
     }
 }
 
@@ -95,7 +95,7 @@ func input(forString prompt: String) -> String? {
     return userInput
 }
 
-func input(forNotNullString prompt: String) -> String? {
+func input(forNotNullString prompt: String) -> String {
     while true {
         print(prompt, terminator: " ")
         if let userInput: String = readLine(), userInput.count > 0 {
@@ -141,21 +141,18 @@ func viewBooks(books: [Book], loans: [Loan]) {
         B. View available books.
         """)
 
-    var looping: Bool = true
     var filteredBooks: [Book] = []
-
+    var looping: Bool = true
     while looping {
-        guard let optionInput: String = input(forString: "Please enter the option letter: ") else {
-            print("Invalid")
-            continue
-        }
+
+        let optionInput: String = input(forNotNullString: "Please enter the option letter: ")
 
         if optionInput.lowercased() == "a" {
-            looping = false
             filteredBooks = books.filter({ $0.exists })
-        } else if optionInput.lowercased() == "b" {
             looping = false
+        } else if optionInput.lowercased() == "b" {
             filteredBooks = books.filter({ $0.exists && $0.isAvailable(book: $0, loans: loans) })
+            looping = false
         } else {
             print("Invalid. Enter 'a' or 'b'.")
         }
@@ -201,27 +198,8 @@ func addBooks(to books: inout [Book]) {
         """)
 
     let id = (books.map { $0.id }.max() ?? 0) + 1
-    var author: String = ""
-    var title: String = ""
-
-    while true {
-        guard let titleInput = input(forString: "Enter book title: "), titleInput.count >= 1 else {
-            print("Please enter a title.")
-            continue
-        }
-        title = titleInput
-        break
-    }
-
-    while true {
-        guard let authorInput = input(forString: "Enter Author's name: "), authorInput.count >= 1
-        else {
-            print("Please enter an author.")
-            continue
-        }
-        author = authorInput
-        break
-    }
+    let title: String = input(forNotNullString: "Enter book title: ")
+    let author: String = input(forNotNullString: "Enter Author's name: ")
 
     let newBook: Book = Book(id: id, title: title, author: author, exists: true)
     books.append(newBook)
@@ -259,12 +237,12 @@ func removeBook(from books: inout [Book]) {
 }
 
 func borrowBook(from books: [Book], to loans: inout [Loan], borrowers: [Borrower]) {
-    print("""
-    \nBorrow a book:
-    -------------------
-    """)
+    print(
+        """
+        \nBorrow a book:
+        -------------------
+        """)
 
-    
 }
 
 func returnBook() {
@@ -280,17 +258,7 @@ func addBorrower(to borrowers: inout [Borrower]) {
         """)
 
     let id = (borrowers.map { $0.id }.max() ?? 0) + 1
-    var name: String = ""
-
-    while true {
-        guard let nameInput = input(forString: "Enter the borrower's name: "), nameInput.count >= 1
-        else {
-            print("Please enter a name.")
-            continue
-        }
-        name = nameInput
-        break
-    }
+    let name: String = input(forNotNullString: "Enter the borrower's name: ")
 
     let newBorrower: Borrower = Borrower(id: id, name: name)
     borrowers.append(newBorrower)
@@ -306,23 +274,24 @@ func editBorrower(from borrowers: inout [Borrower]) {
         """)
 
     var idToEdit: Int = 0
+    
 
     while true {
         guard let idInput = input(forInt: "Enter the borrower's ID number: "), idInput > 0 else {
             print("Please enter a valid ID number.\n")
             continue
-        } 
+        }
         idToEdit = idInput
         break
     }
 
-        if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
-            if let newName: String = input(forString: "Enter the borrower's updated name: ") {
-                borrowers[IndexToedit].name = newName
-            }
-        } else {
-            print("There is no borrower with that ID.")
+    if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
+        if let newName: String = input(forString: "Enter the borrower's updated name: ") {
+            borrowers[IndexToedit].name = newName
         }
+    } else {
+        print("There is no borrower with that ID.")
+    }
 
 }
 
@@ -417,7 +386,7 @@ struct SwiftPlayground {
                     case 1: viewBooks(books: books, loans: loans)
                     case 2: addBooks(to: &books)
                     case 3: removeBook(from: &books)
-                    case 4: borrowBook()
+                    case 4: borrowBook(from: books, to: &loans, borrowers: borrowers)
                     case 5: returnBook()
                     case 6: viewBorrowers(borrowers: borrowers, loans: loans)
                     case 7: addBorrower(to: &borrowers)
