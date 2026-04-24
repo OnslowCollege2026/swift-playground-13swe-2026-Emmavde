@@ -274,7 +274,7 @@ func editBorrower(from borrowers: inout [Borrower]) {
         """)
 
     var idToEdit: Int = 0
-    
+
 
     while true {
         guard let idInput = input(forInt: "Enter the borrower's ID number: "), idInput > 0 else {
@@ -286,9 +286,9 @@ func editBorrower(from borrowers: inout [Borrower]) {
     }
 
     if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
-        if let newName: String = input(forString: "Enter the borrower's updated name: ") {
-            borrowers[IndexToedit].name = newName
-        }
+        let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
+        borrowers[IndexToedit].name = newName
+        
     } else {
         print("There is no borrower with that ID.")
     }
