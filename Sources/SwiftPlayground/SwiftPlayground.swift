@@ -137,10 +137,10 @@ func viewBooks(books: [Book], loans: [Loan]) {
             continue
         }
 
-        if optionInput == "a" {
+        if optionInput.lowercased() == "a" {
             looping = false
             filteredBooks = books.filter({ $0.exists })
-        } else if optionInput == "b" {
+        } else if optionInput.lowercased() == "b" {
             looping = false
             filteredBooks = books.filter({ $0.exists && $0.isAvailable(book: $0, loans: loans) })
         } else {
@@ -187,13 +187,21 @@ func addBooks(to books: inout [Book]) {
         """)
 
     let id = (books.map { $0.id }.max() ?? 0) + 1
-    if let title = input(forString: "Enter book title: ") {
-        if let author = input(forString: "Enter Author's name: ") {
-            let newBook: Book = Book(id: id, title: title, author: author, exists: true)
-            books.append(newBook)
-            print("\(newBook) was added")
+
+    let looping: Bool = true
+
+    while looping {
+        if let title = input(forString: "Enter book title: "), title.count >= 1 {
+            if let author = input(forString: "Enter Author's name: "), author.count >= 1 {
+
+                let looping = false
+
+                let newBook: Book = Book(id: id, title: title, author: author, exists: true)
+                books.append(newBook)
+                print("\(newBook) was added")
+            }
         }
-    }
+    } 
 }
 
 /// 
