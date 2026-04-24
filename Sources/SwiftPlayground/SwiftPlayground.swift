@@ -7,7 +7,7 @@ import Foundation
 import GRDB
 
 /// A Borrower who takes out loans.
-struct Borrower: Identifiable, CustomStringConvertible{
+struct Borrower: Identifiable, CustomStringConvertible {
     static let databaseTableName = "Borrower"
 
     /// The Borrower ID.
@@ -17,7 +17,7 @@ struct Borrower: Identifiable, CustomStringConvertible{
     var name: String
 
     var description: String {
-        "ID; \(id) | Name: \(name) "
+        "ID: \(id) | Name: \(name) "
     }
 }
 
@@ -94,12 +94,21 @@ func input(forString prompt: String) -> String? {
     return userInput
 }
 
+func input(forInt prompt: String) -> Int? {
+    if let userInput = input(forString: prompt), let intInput = Int(userInput) {
+        return intInput
+    } else {
+        return nil
+    }
+
+}
+
 func placeHolder() {
     print("placehold func ran")
 }
 
 let actionOptions: [menuOption] = [
-    menuOption(optionNumber: 1, description: "View books", action:()),
+    menuOption(optionNumber: 1, description: "View books", action: ()),
     menuOption(optionNumber: 2, description: "Add book", action: ()),
     menuOption(optionNumber: 3, description: "Delete book", action: ()),
     menuOption(optionNumber: 4, description: "Borrow book", action: ()),
@@ -116,7 +125,8 @@ let preSetBooks: [Book] = [
     Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
     Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
     Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
-    Book(id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
+    Book(
+        id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
     Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
     Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
     Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
@@ -170,15 +180,14 @@ func viewBooks(books: [Book], loans: [Loan]) {
         guard let optionInput: String = input(forString: "Please enter the option letter: ") else {
             print("Invalid")
             continue
-        } 
-
+        }
 
         if optionInput == "a" {
             looping = false
-            filteredBooks = books.filter({$0.exists})
+            filteredBooks = books.filter({ $0.exists })
         } else if optionInput == "b" {
             looping = false
-            filteredBooks = books.filter({$0.exists && $0.isAvailable(book: $0, loans: loans)})
+            filteredBooks = books.filter({ $0.exists && $0.isAvailable(book: $0, loans: loans) })
         } else {
             print("Invalid. Enter 'a' or 'b'.")
         }
@@ -196,23 +205,29 @@ func viewBooks(books: [Book], loans: [Loan]) {
             availability = "Available"
         }
         print("\(book) | \(availability)")
-        }
-
     }
 
+}
+
 func viewBorrowers(borrowers: [Borrower]) {
+    print(
+        """
+        Borrowers list:
+        ---------------------
+        """)
     for borrower in borrowers {
         print(borrower)
     }
 }
 
 func addBooks(to books: inout [Book]) {
-    print("""
-    Add a book:
-    ------------------
-    """)
+    print(
+        """
+        Add a book:
+        ------------------
+        """)
 
-    let id = (books.map{$0.id}.max() ?? 0) + 1
+    let id = (books.map { $0.id }.max() ?? 0) + 1
     if let title = input(forString: "Enter book title: ") {
         if let author = input(forString: "Enter Author's name: ") {
             let newBook: Book = Book(id: id, title: title, author: author, exists: true)
@@ -223,11 +238,29 @@ func addBooks(to books: inout [Book]) {
 }
 
 func removeBook(from books: inout [Book]) {
-    print("""
-    Remove a book: (This will not remove the book from loan history.)
+    print(
+        """
+        Remove a book: (This will not remove the book from loan history.)
+        -------------------------------------------------------------------
+        """)
 
-    """)
+    while true {
+        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete") else {
+            print("Please enter a valid ID number.\n")
+            continue
+        }
+
+        if var IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }) ) {
+            books[IndexToRemove].exists = false
+            print("\(IndexToRemove) has been removed from the library.")
+
+        } else{
+            print("Book does not exist or has already been removed.")
+        } 
+        return
+    }
 }
+
 @main
 struct SwiftPlayground {
     static func main() {
@@ -265,7 +298,7 @@ struct SwiftPlayground {
                     switch optionNumber {
                     case 1: viewBooks(books: books, loans: loans)
                     case 2: addBooks(to: &books)
-                    case 3: placeHolder()
+                    case 3: removeBook(from: &books)
                     case 4: placeHolder()
                     case 5: placeHolder()
                     case 6: viewBorrowers(borrowers: borrowers)
