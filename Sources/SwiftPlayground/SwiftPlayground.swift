@@ -79,9 +79,6 @@ struct menuOption {
 
     // The description of what action it performs.
     let description: String
-
-    // The function that option calls.
-    let action: ()
 }
 
 /// Get user input in the from of a string.
@@ -93,7 +90,10 @@ func input(forString prompt: String) -> String? {
     let userInput: String? = readLine()
     return userInput
 }
-
+/// Get user input in the form of an integer.
+/// 
+/// - Parameter prompt: 
+/// - Returns: 
 func input(forInt prompt: String) -> Int? {
     if let userInput = input(forString: prompt), let intInput = Int(userInput) {
         return intInput
@@ -103,54 +103,8 @@ func input(forInt prompt: String) -> Int? {
 
 }
 
-func placeHolder() {
-    print("placehold func ran")
-}
 
-let actionOptions: [menuOption] = [
-    menuOption(optionNumber: 1, description: "View books", action: ()),
-    menuOption(optionNumber: 2, description: "Add book", action: ()),
-    menuOption(optionNumber: 3, description: "Delete book", action: ()),
-    menuOption(optionNumber: 4, description: "Borrow book", action: ()),
-    menuOption(optionNumber: 5, description: "return book", action: ()),
-    menuOption(optionNumber: 6, description: "View borrowers", action: ()),
-    menuOption(optionNumber: 7, description: "Add borrower", action: ()),
-    menuOption(optionNumber: 8, description: "Edit borrower", action: ()),
-]
-
-// Some books to add to the library for testing.
-let preSetBooks: [Book] = [
-    Book(id: 1, title: "1984", author: "George Orwell", exists: true),
-    Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew", exists: true),
-    Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
-    Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
-    Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
-    Book(
-        id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
-    Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
-    Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
-    Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
-    Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu", exists: true),
-]
-
-// SOme borrower data to add to the library for testing.
-let preSetBorrowers: [Borrower] = [
-    Borrower(id: 1, name: "Alice Johnson"),
-    Borrower(id: 2, name: "Bo-Katan Kryze"),
-    Borrower(id: 3, name: "Charlotte Smith"),
-    Borrower(id: 4, name: "Daniel Lee"),
-    Borrower(id: 5, name: "Gamora"),
-    Borrower(id: 6, name: "Gandalf"),
-]
-
-// Some past loan data to add to the library for testing.
-let preSetLoans: [Loan] = [
-    Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
-    Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
-    Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
-    Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
-]
-
+/// Print the menu of user actions.
 func showActions() {
     print(
         """
@@ -163,6 +117,7 @@ func showActions() {
     }
 }
 ///
+/// 
 /// - Parameters:
 ///   - books:
 ///   - loans:
@@ -209,6 +164,8 @@ func viewBooks(books: [Book], loans: [Loan]) {
 
 }
 
+/// 
+/// - Parameter borrowers: 
 func viewBorrowers(borrowers: [Borrower]) {
     print(
         """
@@ -220,6 +177,8 @@ func viewBorrowers(borrowers: [Borrower]) {
     }
 }
 
+/// 
+/// - Parameter books: 
 func addBooks(to books: inout [Book]) {
     print(
         """
@@ -237,6 +196,8 @@ func addBooks(to books: inout [Book]) {
     }
 }
 
+/// 
+/// - Parameter books: 
 func removeBook(from books: inout [Book]) {
     print(
         """
@@ -245,14 +206,14 @@ func removeBook(from books: inout [Book]) {
         """)
 
     while true {
-        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete") else {
+        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: ") else {
             print("Please enter a valid ID number.\n")
             continue
         }
 
         if var IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }) ) {
             books[IndexToRemove].exists = false
-            print("\(IndexToRemove) has been removed from the library.")
+            print("\(books[IndexToRemove]) has been removed from the library.")
 
         } else{
             print("Book does not exist or has already been removed.")
@@ -260,6 +221,66 @@ func removeBook(from books: inout [Book]) {
         return
     }
 }
+
+func borrowBook() {
+    print("borrowBook() ran.")
+}
+
+func returnBook() {
+    print("returnBook() ran.")
+}
+
+func addBorrower() {
+    print("addBorrower() ran.")
+}
+
+func editBorrower() {
+    print("editBorrower() ran.")
+}
+
+// The different actions dispalyed in the option menu. 
+let actionOptions: [menuOption] = [
+    menuOption(optionNumber: 1, description: "View books"),
+    menuOption(optionNumber: 2, description: "Add book"),
+    menuOption(optionNumber: 3, description: "Delete book"),
+    menuOption(optionNumber: 4, description: "Borrow book"),
+    menuOption(optionNumber: 5, description: "return book"),
+    menuOption(optionNumber: 6, description: "View borrowers"),
+    menuOption(optionNumber: 7, description: "Add borrower"),
+    menuOption(optionNumber: 8, description: "Edit borrower")
+]
+
+// Some books to add to the library for testing.
+let preSetBooks: [Book] = [
+    Book(id: 1, title: "1984", author: "George Orwell", exists: true),
+    Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew", exists: true),
+    Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
+    Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
+    Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
+    Book(id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
+    Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
+    Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
+    Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
+    Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu", exists: true),
+]
+
+// Some borrower data to add to the library for testing.
+let preSetBorrowers: [Borrower] = [
+    Borrower(id: 1, name: "Alice Johnson"),
+    Borrower(id: 2, name: "Bo-Katan Kryze"),
+    Borrower(id: 3, name: "Charlotte Smith"),
+    Borrower(id: 4, name: "Daniel Lee"),
+    Borrower(id: 5, name: "Gamora"),
+    Borrower(id: 6, name: "Gandalf"),
+]
+
+// Some past loan data to add to the library for testing.
+let preSetLoans: [Loan] = [
+    Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
+    Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
+    Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
+    Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
+]
 
 @main
 struct SwiftPlayground {
@@ -292,21 +313,19 @@ struct SwiftPlayground {
 
             else {
                 if let optionNumber = Int(optionInput) {
-                    // if let option = actionOptions.first(where: {$0.optionNumber == optionNumber}) {
-                    //     option.action
-                    // }
+
                     switch optionNumber {
                     case 1: viewBooks(books: books, loans: loans)
                     case 2: addBooks(to: &books)
                     case 3: removeBook(from: &books)
-                    case 4: placeHolder()
-                    case 5: placeHolder()
+                    case 4: borrowBook()
+                    case 5: returnBook()
                     case 6: viewBorrowers(borrowers: borrowers)
-                    case 7: placeHolder()
-                    case 8: placeHolder()
-                    default: print("Invalid. Please enter a number or 'done'.")
+                    case 7: addBorrower()
+                    case 8: editBorrower()
+                    default: print("Invalid. Please enter a number from the menu, or 'done'.")
                     }
-                }
+                } else {print("Invalid. Please enter a number from the menu, or 'done'.")}
 
             }
         }
