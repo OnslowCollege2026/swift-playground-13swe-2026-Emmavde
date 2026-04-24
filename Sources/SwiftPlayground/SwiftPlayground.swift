@@ -94,6 +94,16 @@ func input(forString prompt: String) -> String? {
     let userInput: String? = readLine()
     return userInput
 }
+
+func input(forNotNullString prompt: String) -> String? {
+    while true {
+        print(prompt, terminator: " ")
+        if let userInput: String = readLine(), userInput.count > 0 {
+            return userInput
+        }
+        print("Invalid. Input cannot be empty.")
+    }
+}
 /// Get user input in the form of an integer.
 ///
 /// - Parameter prompt:
