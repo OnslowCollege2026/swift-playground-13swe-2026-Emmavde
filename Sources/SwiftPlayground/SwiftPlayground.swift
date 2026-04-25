@@ -76,9 +76,10 @@ struct Loan: Identifiable {
     var returned: Bool
 
     func loanDetails(books: [Book], borrowers: [Borrower]) -> String {
-        let title: String = books.first(where: { $0.id == bookId})?.title ?? ""
-        let borrowerName: String = borrowers.first(where: {$0.id == borrowerId})?.name ?? ""
-        return ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not ") Returned. ")
+        let title: String = books.first(where: { $0.id == bookId })?.title ?? ""
+        let borrowerName: String = borrowers.first(where: { $0.id == borrowerId })?.name ?? ""
+        return
+            ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not") Returned. ")
     }
 }
 
@@ -123,12 +124,15 @@ func input(forInt prompt: String) -> Int? {
 
 }
 
+/// 
+/// - Parameter prompt: 
+/// - Returns: 
 func input(loopUntilPositiveIntGiven prompt: String) -> Int {
     while true {
         if let userInput = input(forInt: prompt), userInput > 0 {
             return userInput
         }
-        print("Invalid. Please enter an integer.")
+        print("Invalid. Please enter a positive integer.")
     }
 }
 
@@ -239,7 +243,7 @@ func removeBook(from books: inout [Book]) {
             continue
         }
 
-        if var IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }))
+        if let IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }))
         {
             books[IndexToRemove].exists = false
             print("\(books[IndexToRemove]) has been removed from the library.")
@@ -251,6 +255,11 @@ func removeBook(from books: inout [Book]) {
     }
 }
 
+/// 
+/// - Parameters:
+///   - books: 
+///   - borrowers: 
+///   - loans: 
 func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout [Loan]) {
     print(
         """
@@ -259,34 +268,63 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         """)
 
     let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
-    let borrowerId: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID.")
-    let bookId: Int = input(
-        loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow.")
-    let loanPeriod: Int = input(
-        loopUntilPositiveIntGiven: """
-            How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days.)
-            """)
+    var borrowerId: Int = 0
+    var bookId: Int = 0
+    var loanPeriod: Int = 0
 
-    var looping: Bool = true
-    while looping {
-        if loanPeriod > 0 && loanPeriod < maxLoanPeriod {
-
-            let newLoan: Loan = Loan(
-                id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
-                returned: false)
-
-            loans.append(newLoan)
-            
-            looping = false
+    while true {
+        let id: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
+        if borrowers.contains(where: { $0.id == id }) {
+            borrowerId = id
+            break
+        } else {
+            print("No borrower of this ID exists.")
         }
     }
 
+    while true {
+        let id: Int = input(
+            loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
+        if let bookToBorrow = books.first(where: { $0.id == id}),
+            bookToBorrow.exists,
+            bookToBorrow.isAvailable(book: bookToBorrow, loans: loans)
+        {
+            bookId = id
+            break
+        } else {
+            print("No book of this ID exists, or the book is currently unavialable.")
+        }
+    }
+
+    while true {
+        loanPeriod = input(
+            loopUntilPositiveIntGiven: """
+                How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days): 
+                """)
+
+        if loanPeriod > 0 && loanPeriod < maxLoanPeriod {
+            break
+        } else {
+            print("The maximum loan period is \(maxLoanPeriod) days.")
+        }
+    }
+
+    let newLoan: Loan = Loan(
+        id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
+        returned: false)
+
+    loans.append(newLoan)
+    print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
+
 }
+
 
 func returnBook() {
     print("returnBook() ran.")
 }
 
+/// 
+/// - Parameter borrowers: 
 func addBorrower(to borrowers: inout [Borrower]) {
 
     print(
@@ -304,6 +342,8 @@ func addBorrower(to borrowers: inout [Borrower]) {
 
 }
 
+/// 
+/// - Parameter borrowers: 
 func editBorrower(from borrowers: inout [Borrower]) {
     print(
         """
@@ -332,12 +372,30 @@ func editBorrower(from borrowers: inout [Borrower]) {
 
 }
 
+
 func searchBooks() {
     print("searchBooks() ran")
 }
 
 func searchBorrowers() {
     print("searchBorrowers() ran")
+}
+
+/// 
+/// - Parameters:
+///   - loans: 
+///   - books: 
+///   - borrowers: 
+func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
+    print(
+        """
+        Loan history:
+        ---------------
+        """)
+
+    for loan in loans {
+        print(loan.loanDetails(books: books, borrowers: borrowers))
+    }
 }
 
 //
@@ -355,6 +413,7 @@ let actionOptions: [menuOption] = [
     menuOption(optionNumber: 8, description: "Edit a borrower's details"),
     menuOption(optionNumber: 9, description: "Search books"),
     menuOption(optionNumber: 10, description: "Search Borrowers"),
+    menuOption(optionNumber: 11, description: "View loan records."),
 ]
 
 // Some books to add to the library for testing.
@@ -433,6 +492,7 @@ struct SwiftPlayground {
                     case 8: editBorrower(from: &borrowers)
                     case 9: searchBooks()
                     case 10: searchBorrowers()
+                    case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
                     }
                 } else {
@@ -442,4 +502,3 @@ struct SwiftPlayground {
         }
     }
 }
-
