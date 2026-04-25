@@ -124,9 +124,9 @@ func input(forInt prompt: String) -> Int? {
 
 }
 
-/// 
-/// - Parameter prompt: 
-/// - Returns: 
+///
+/// - Parameter prompt:
+/// - Returns:
 func input(loopUntilPositiveIntGiven prompt: String) -> Int {
     while true {
         if let userInput = input(forInt: prompt), userInput > 0 {
@@ -255,11 +255,11 @@ func removeBook(from books: inout [Book]) {
     }
 }
 
-/// 
+///
 /// - Parameters:
-///   - books: 
-///   - borrowers: 
-///   - loans: 
+///   - books:
+///   - borrowers:
+///   - loans:
 func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout [Loan]) {
     print(
         """
@@ -267,64 +267,85 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         -------------------
         """)
 
-    let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
-    var borrowerId: Int = 0
-    var bookId: Int = 0
-    var loanPeriod: Int = 0
+    if books.filter({ $0.isAvailable(book: $0, loans: loans) }).isEmpty {
+        print("Unfortunately all books are on loan. ")
+    } else {
 
-    while true {
-        let id: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
-        if borrowers.contains(where: { $0.id == id }) {
-            borrowerId = id
-            break
-        } else {
-            print("No borrower of this ID exists.")
+        let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
+        var borrowerId: Int = 0
+        var bookId: Int = 0
+        var loanPeriod: Int = 0
+
+        while true {
+            let id: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
+            if borrowers.contains(where: { $0.id == id }) {
+                borrowerId = id
+                break
+            } else {
+                print("No borrower of this ID exists.")
+            }
         }
-    }
 
-    while true {
-        let id: Int = input(
-            loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
-        if let bookToBorrow = books.first(where: { $0.id == id}),
-            bookToBorrow.exists,
-            bookToBorrow.isAvailable(book: bookToBorrow, loans: loans)
-        {
-            bookId = id
-            break
-        } else {
-            print("No book of this ID exists, or the book is currently unavialable.")
+        while true {
+            let id: Int = input(
+                loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
+            if let bookToBorrow = books.first(where: { $0.id == id }),
+                bookToBorrow.exists,
+                bookToBorrow.isAvailable(book: bookToBorrow, loans: loans)
+            {
+                bookId = id
+                break
+            } else {
+                print("No book of this ID exists, or the book is currently unavialable.")
+            }
         }
-    }
 
-    while true {
-        loanPeriod = input(
-            loopUntilPositiveIntGiven: """
-                How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days): 
-                """)
+        while true {
+            loanPeriod = input(
+                loopUntilPositiveIntGiven: """
+                    How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days): 
+                    """)
 
-        if loanPeriod > 0 && loanPeriod < maxLoanPeriod {
-            break
-        } else {
-            print("The maximum loan period is \(maxLoanPeriod) days.")
+            if loanPeriod > 0 && loanPeriod <= maxLoanPeriod {
+                break
+            } else {
+                print("The maximum loan period is \(maxLoanPeriod) days.")
+            }
         }
+
+        let newLoan: Loan = Loan(
+            id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
+            returned: false)
+
+        loans.append(newLoan)
+        print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
     }
-
-    let newLoan: Loan = Loan(
-        id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
-        returned: false)
-
-    loans.append(newLoan)
-    print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
 
 }
 
+///
+/// - Parameters:
+///   - loans:
+///   - books:
+func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
+    print(
+        """
+        Return a book:
+        --------------------
+        """)
 
-func returnBook() {
-    print("returnBook() ran.")
+    let id = input(loopUntilPositiveIntGiven: "Enter the ID of the book you are returning: ")
+
+    if let indexToedit: Int = loans.firstIndex(where: { $0.bookId == id && !$0.returned }) {
+        loans[indexToedit].returned = true
+        print(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
+    } else {
+        print("This book is not on loan, or does not exist.")
+    }
 }
 
-/// 
-/// - Parameter borrowers: 
+///
+/// - Parameter borrowers:
 func addBorrower(to borrowers: inout [Borrower]) {
 
     print(
@@ -342,8 +363,8 @@ func addBorrower(to borrowers: inout [Borrower]) {
 
 }
 
-/// 
-/// - Parameter borrowers: 
+///
+/// - Parameter borrowers:
 func editBorrower(from borrowers: inout [Borrower]) {
     print(
         """
@@ -362,16 +383,15 @@ func editBorrower(from borrowers: inout [Borrower]) {
         break
     }
 
-    if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
+    if let indexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
         let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
-        borrowers[IndexToedit].name = newName
+        borrowers[indexToedit].name = newName
 
     } else {
         print("There is no borrower with that ID.")
     }
 
 }
-
 
 func searchBooks() {
     print("searchBooks() ran")
@@ -381,11 +401,11 @@ func searchBorrowers() {
     print("searchBorrowers() ran")
 }
 
-/// 
+///
 /// - Parameters:
-///   - loans: 
-///   - books: 
-///   - borrowers: 
+///   - loans:
+///   - books:
+///   - borrowers:
 func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
     print(
         """
@@ -486,7 +506,7 @@ struct SwiftPlayground {
                     case 2: addBooks(to: &books)
                     case 3: removeBook(from: &books)
                     case 4: borrowBook(from: books, from: borrowers, to: &loans)
-                    case 5: returnBook()
+                    case 5: returnBook(to: &loans, books: books, borrowers: borrowers)
                     case 6: viewBorrowers(borrowers: borrowers, loans: loans)
                     case 7: addBorrower(to: &borrowers)
                     case 8: editBorrower(from: &borrowers)
