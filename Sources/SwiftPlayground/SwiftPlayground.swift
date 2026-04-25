@@ -74,6 +74,12 @@ struct Loan: Identifiable {
 
     /// Whether or not the book was returned.
     var returned: Bool
+
+    func loanDetails(books: [Book], borrowers: [Borrower]) -> String {
+        let title: String = books.first(where: { $0.id == bookId})?.title ?? ""
+        let borrowerName: String = borrowers.first(where: {$0.id == borrowerId})?.name ?? ""
+        return ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not ") Returned. ")
+    }
 }
 
 /// A single option on the action menu option.
@@ -115,6 +121,15 @@ func input(forInt prompt: String) -> Int? {
         return nil
     }
 
+}
+
+func input(loopUntilPositiveIntGiven prompt: String) -> Int {
+    while true {
+        if let userInput = input(forInt: prompt), userInput > 0 {
+            return userInput
+        }
+        print("Invalid. Please enter an integer.")
+    }
 }
 
 /// Print the menu of user actions.
@@ -236,12 +251,35 @@ func removeBook(from books: inout [Book]) {
     }
 }
 
-func borrowBook(from books: [Book], to loans: inout [Loan], borrowers: [Borrower]) {
+func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout [Loan]) {
     print(
         """
         \nBorrow a book:
         -------------------
         """)
+
+    let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
+    let borrowerId: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID.")
+    let bookId: Int = input(
+        loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow.")
+    let loanPeriod: Int = input(
+        loopUntilPositiveIntGiven: """
+            How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days.)
+            """)
+
+    var looping: Bool = true
+    while looping {
+        if loanPeriod > 0 && loanPeriod < maxLoanPeriod {
+
+            let newLoan: Loan = Loan(
+                id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
+                returned: false)
+
+            loans.append(newLoan)
+            
+            looping = false
+        }
+    }
 
 }
 
@@ -275,7 +313,6 @@ func editBorrower(from borrowers: inout [Borrower]) {
 
     var idToEdit: Int = 0
 
-
     while true {
         guard let idInput = input(forInt: "Enter the borrower's ID number: "), idInput > 0 else {
             print("Please enter a valid ID number.\n")
@@ -288,7 +325,7 @@ func editBorrower(from borrowers: inout [Borrower]) {
     if let IndexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
         let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
         borrowers[IndexToedit].name = newName
-        
+
     } else {
         print("There is no borrower with that ID.")
     }
@@ -302,6 +339,9 @@ func searchBooks() {
 func searchBorrowers() {
     print("searchBorrowers() ran")
 }
+
+//
+let maxLoanPeriod = 21
 
 // The different actions dispalyed in the option menu.
 let actionOptions: [menuOption] = [
@@ -386,7 +426,7 @@ struct SwiftPlayground {
                     case 1: viewBooks(books: books, loans: loans)
                     case 2: addBooks(to: &books)
                     case 3: removeBook(from: &books)
-                    case 4: borrowBook(from: books, to: &loans, borrowers: borrowers)
+                    case 4: borrowBook(from: books, from: borrowers, to: &loans)
                     case 5: returnBook()
                     case 6: viewBorrowers(borrowers: borrowers, loans: loans)
                     case 7: addBorrower(to: &borrowers)
@@ -402,3 +442,4 @@ struct SwiftPlayground {
         }
     }
 }
+
