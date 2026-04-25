@@ -393,8 +393,28 @@ func editBorrower(from borrowers: inout [Borrower]) {
 
 }
 
-func searchBooks() {
-    print("searchBooks() ran")
+func searchBooks(books: [Book]) {
+    print(
+        """
+        Search for books:
+        ---------------------
+        """)
+    let keyword: String = input(forNotNullString: "Enter a title, author or keyword to search: ")
+        .lowercased()
+
+    let results: [Book] = books.filter {
+        ($0.title.lowercased().contains(keyword) || $0.author.lowercased().contains(keyword))
+            && $0.exists
+    }
+
+    if results.isEmpty {
+        print("No books contain that keyword.")
+    } else {
+        print("\(results.count) results found:\n")
+        for book in results {
+            print(book)
+        }
+    }
 }
 
 func searchBorrowers() {
@@ -510,7 +530,7 @@ struct SwiftPlayground {
                     case 6: viewBorrowers(borrowers: borrowers, loans: loans)
                     case 7: addBorrower(to: &borrowers)
                     case 8: editBorrower(from: &borrowers)
-                    case 9: searchBooks()
+                    case 9: searchBooks(books: books)
                     case 10: searchBorrowers()
                     case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
