@@ -16,16 +16,21 @@ struct Borrower: Identifiable, CustomStringConvertible {
     /// The Borrower's name.
     var name: String
 
+    /// The borrower's ID and name formated in a string.
     var description: String {
         "ID: \(id) | Name: \(name) "
     }
 
+    /// Calculates the number of books a borrower currently has on loan.
+    ///
+    /// - Parameter loans: The list of loan records the borrower ID is checked against.
+    /// - Returns: The number of current loans the borrower has (books that are not returned).
     func currentLoans(loans: [Loan]) -> Int {
         loans.reduce(0) { $0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0) }
     }
 }
 
-/// A book that can be loaned.
+/// A book in the library.
 struct Book: Identifiable, CustomStringConvertible {
 
     /// The Book ID.
@@ -37,23 +42,23 @@ struct Book: Identifiable, CustomStringConvertible {
     /// The Book's author.
     let author: String
 
-    // Whether or not the book stilll exists in the libraries catalouge.
+    /// Whether or not the book stilll exists in the libraries catalouge.
     var exists: Bool
 
+    /// Formats the book's ID, title and author in a string.
     var description: String {
         "ID: \(id) | Title: \(title) | Author: \(author)"
     }
 
+    /// Checks whether the book is available to borrow or not.
     ///
-    ///
-    /// - Parameters:
-    ///   - book:
-    ///   - loans:
-    /// - Returns:
-    func isAvailable(book: Book, loans: [Loan]) -> Bool {
-        !loans.contains(where: { $0.bookId == book.id && !$0.returned })
+    /// - Parameter loans: The list of loan records the book is checked against.
+    /// - Returns: A boolean value of whether the book is available or not.
+    func isAvailable(loans: [Loan]) -> Bool {
+        
+        // Check that the book's id is not in a loan that has not bean returned.
+        !loans.contains(where: { $0.bookId == id && !$0.returned })
     }
-
 }
 
 /// A single loan record of a book.
@@ -75,6 +80,12 @@ struct Loan: Identifiable {
     /// Whether or not the book was returned.
     var returned: Bool
 
+    /// Gets the book and borrower details of a loan.
+    ///
+    /// - Parameters:
+    ///   - books: The array of books.
+    ///   - borrowers: The array of borrowers.
+    /// - Returns: A string containing the loans details as well as the title of the book, and the borrowers name.
     func loanDetails(books: [Book], borrowers: [Borrower]) -> String {
         let title: String = books.first(where: { $0.id == bookId })?.title ?? ""
         let borrowerName: String = borrowers.first(where: { $0.id == borrowerId })?.name ?? ""
@@ -92,22 +103,38 @@ struct menuOption {
     let description: String
 }
 
-/// Get user input in the from of a string.
+/// Gets user input in the form of a string.
 ///
 /// - Parameter prompt: The prompt displayed to the user.
 /// - Returns: The string the user inputted.
 func input(forString prompt: String) -> String? {
+    // Print the prompt/question.
     print(prompt, terminator: " ")
+
+    // Allow the user to enter an input.
     let userInput: String? = readLine()
+
+    // Return the user's input.
     return userInput
 }
 
+/// Gets user input in the form of a string, repeating until not null input is given.
+/// 
+/// - Parameter prompt: The prompt displayed to the user.
+/// - Returns: The string the user inputted.
 func input(forNotNullString prompt: String) -> String {
+
+    // Repeat until a input that is not null is given.
     while true {
+        // Print the prompt/question.
         print(prompt, terminator: " ")
+
+        // Allow the user to enter an input.
+        // If it is not null, return the input and stop looping.
         if let userInput: String = readLine(), userInput.count > 0 {
             return userInput
         }
+        // If the input was null, print an error message and keep looping.
         print("Invalid. Input cannot be empty.")
     }
 }
@@ -170,7 +197,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
             filteredBooks = books.filter({ $0.exists })
             looping = false
         } else if optionInput.lowercased() == "b" {
-            filteredBooks = books.filter({ $0.exists && $0.isAvailable(book: $0, loans: loans) })
+            filteredBooks = books.filter({ $0.exists && $0.isAvailable(loans: loans) })
             looping = false
         } else {
             print("Invalid. Enter 'a' or 'b'.")
@@ -183,9 +210,9 @@ func viewBooks(books: [Book], loans: [Loan]) {
         ----------------
         """)
 
-    for book in filteredBooks.sorted(by: {$0.id < $1.id}) {
+    for book in filteredBooks.sorted(by: { $0.id < $1.id }) {
         var availability: String = "Not available"
-        if book.isAvailable(book: book, loans: loans) {
+        if book.isAvailable(loans: loans) {
             availability = "Available"
         }
         print("\(book) | \(availability)")
@@ -201,7 +228,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
         Borrowers list:
         ---------------------
         """)
-    for borrower in borrowers.sorted(by: {$0.id < $1.id}) {
+    for borrower in borrowers.sorted(by: { $0.id < $1.id }) {
         let currentLoans: Int = borrower.currentLoans(loans: loans)
         print("\(borrower) | \(currentLoans) books on loan.")
     }
@@ -267,7 +294,7 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         -------------------
         """)
 
-    if books.filter({ $0.isAvailable(book: $0, loans: loans) }).isEmpty {
+    if books.filter({ $0.isAvailable(loans: loans) }).isEmpty {
         print("Unfortunately all books are on loan. ")
     } else {
 
@@ -291,7 +318,7 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
                 loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
             if let bookToBorrow = books.first(where: { $0.id == id }),
                 bookToBorrow.exists,
-                bookToBorrow.isAvailable(book: bookToBorrow, loans: loans)
+                bookToBorrow.isAvailable(loans: loans)
             {
                 bookId = id
                 break
@@ -393,8 +420,8 @@ func editBorrower(from borrowers: inout [Borrower]) {
 
 }
 
-/// 
-/// - Parameter books: 
+///
+/// - Parameter books:
 func searchBooks(books: [Book]) {
     print(
         """
@@ -419,8 +446,8 @@ func searchBooks(books: [Book]) {
     }
 }
 
-/// 
-/// - Parameter borrowers: 
+///
+/// - Parameter borrowers:
 func searchBorrowers(borrowers: [Borrower]) {
     print(
         """
@@ -443,7 +470,6 @@ func searchBorrowers(borrowers: [Borrower]) {
         }
     }
 }
-
 
 ///
 /// - Parameters:
