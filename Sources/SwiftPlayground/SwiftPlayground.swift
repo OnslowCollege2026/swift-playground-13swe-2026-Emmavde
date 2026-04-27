@@ -183,7 +183,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
         ----------------
         """)
 
-    for book in filteredBooks {
+    for book in filteredBooks.sorted(by: {$0.id < $1.id}) {
         var availability: String = "Not available"
         if book.isAvailable(book: book, loans: loans) {
             availability = "Available"
@@ -201,7 +201,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
         Borrowers list:
         ---------------------
         """)
-    for borrower in borrowers {
+    for borrower in borrowers.sorted(by: {$0.id < $1.id}) {
         let currentLoans: Int = borrower.currentLoans(loans: loans)
         print("\(borrower) | \(currentLoans) books on loan.")
     }
@@ -393,10 +393,12 @@ func editBorrower(from borrowers: inout [Borrower]) {
 
 }
 
+/// 
+/// - Parameter books: 
 func searchBooks(books: [Book]) {
     print(
         """
-        Search for books:
+        \nSearch for books:
         ---------------------
         """)
     let keyword: String = input(forNotNullString: "Enter a title, author or keyword to search: ")
@@ -417,9 +419,31 @@ func searchBooks(books: [Book]) {
     }
 }
 
-func searchBorrowers() {
-    print("searchBorrowers() ran")
+/// 
+/// - Parameter borrowers: 
+func searchBorrowers(borrowers: [Borrower]) {
+    print(
+        """
+        \nSearch for borrowers:
+        ---------------------
+        """)
+    let keyword: String = input(forNotNullString: "Enter a part of the borrower's name: ")
+        .lowercased()
+
+    let results: [Borrower] = borrowers.filter {
+        ($0.name.lowercased().contains(keyword))
+    }
+
+    if results.isEmpty {
+        print("No borrower's have that name.")
+    } else {
+        print("\(results.count) results found:\n")
+        for borrower in results {
+            print(borrower)
+        }
+    }
 }
+
 
 ///
 /// - Parameters:
@@ -531,7 +555,7 @@ struct SwiftPlayground {
                     case 7: addBorrower(to: &borrowers)
                     case 8: editBorrower(from: &borrowers)
                     case 9: searchBooks(books: books)
-                    case 10: searchBorrowers()
+                    case 10: searchBorrowers(borrowers: borrowers)
                     case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
                     }
