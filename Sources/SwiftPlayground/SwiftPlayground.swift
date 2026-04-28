@@ -140,101 +140,136 @@ func input(forNotNullString prompt: String) -> String {
 }
 /// Get user input in the form of an integer.
 ///
-/// - Parameter prompt:
-/// - Returns:
+/// - Parameter prompt: The prompt displayed to the user.
+/// - Returns: The user's input as an integer value. 
 func input(forInt prompt: String) -> Int? {
+    // Allow the user to enter an input.
     if let userInput = input(forString: prompt), let intInput = Int(userInput) {
+        // if the input was an Integer, return that value.
         return intInput
     } else {
+        // if it was not an integer, return nil.
         return nil
     }
 
 }
 
-///
-/// - Parameter prompt:
-/// - Returns:
+/// Gets user input in the form of an integer, repeating until an integer is given.
+/// 
+/// - Parameter prompt: The prompt displayed to the user.
+/// - Returns: The user's input as an integer value.
 func input(loopUntilPositiveIntGiven prompt: String) -> Int {
+    // Loop until an integer is given.
     while true {
+        // Allow the user to enter an input.
         if let userInput = input(forInt: prompt), userInput > 0 {
+            // Rteurn that input and stop looping if an Int is given.
             return userInput
         }
+        // Otherwise pritn an error message and keep looping.
         print("Invalid. Please enter a positive integer.")
     }
 }
 
 /// Print the menu of user actions.
 func showActions() {
+    // Print a heading.
     print(
         """
         \n------------------------------------
         Choose an action from the menu:
         ------------------------------------
         """)
+
+    // Print each option along with its option number in a list.
     for option in actionOptions {
         print("\(option.optionNumber). \(option.description)")
     }
 }
-///
+/// View all of the books in the library.
 ///
 /// - Parameters:
-///   - books:
-///   - loans:
+///   - books: The array of all books in the library.
+///   - loans: The array of all loan history.
 func viewBooks(books: [Book], loans: [Loan]) {
+    // Print the user's view options.
     print(
         """
         A. View all books.
         B. View available books.
         """)
 
+    // An empty array for the filtered books.
     var filteredBooks: [Book] = []
+
+    // A varaiable that controls the input loop. 
     var looping: Bool = true
+    // Loop until a valid input is given.
     while looping {
 
+        // Ask the user's option choice.
         let optionInput: String = input(forNotNullString: "Please enter the option letter: ")
 
+        // If the user enter 'a'
         if optionInput.lowercased() == "a" {
+            // Filter for only the existing books.
             filteredBooks = books.filter({ $0.exists })
+            // Stop looping.
             looping = false
+        // If the user enter 'b'
         } else if optionInput.lowercased() == "b" {
+            // Filter for books that exist and are currently available.
             filteredBooks = books.filter({ $0.exists && $0.isAvailable(loans: loans) })
+            // Stop looping
             looping = false
+        // If input is invalid, print an error message and continue looping.
         } else {
             print("Invalid. Enter 'a' or 'b'.")
         }
     }
 
+    // Print the heading:
     print(
         """
         \nBook list:
         ----------------
         """)
 
+    // Print each of the filtered for books in a list, sorted by ID number.
     for book in filteredBooks.sorted(by: { $0.id < $1.id }) {
         var availability: String = "Not available"
+        // Determine the books avaialbility.
         if book.isAvailable(loans: loans) {
             availability = "Available"
         }
+        // Print the book's details and its availability.
         print("\(book) | \(availability)")
     }
 
 }
 
-///
-/// - Parameter borrowers:
+/// View all of the borrowers in the system.
+/// 
+/// - Parameter borrowers: The array of all borrowers in the library.
+/// 
 func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
+    // Print a heading.
     print(
         """
         Borrowers list:
         ---------------------
         """)
+    // Print each borrower in the list, sorted by ID number. 
     for borrower in borrowers.sorted(by: { $0.id < $1.id }) {
+        // Calculate the number of loans the borrower currently has out. 
         let currentLoans: Int = borrower.currentLoans(loans: loans)
+        // Print the borrower's details and their number of current loans.
         print("\(borrower) | \(currentLoans) books on loan.")
     }
 }
 
-///
+/// Add a book to the library. 
+/// 
 /// - Parameter books:
 func addBooks(to books: inout [Book]) {
     print(
@@ -282,7 +317,8 @@ func removeBook(from books: inout [Book]) {
     }
 }
 
-///
+/// 
+/// 
 /// - Parameters:
 ///   - books:
 ///   - borrowers:
