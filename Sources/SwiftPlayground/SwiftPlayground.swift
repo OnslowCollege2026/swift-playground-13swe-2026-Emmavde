@@ -166,7 +166,7 @@ func input(loopUntilPositiveIntGiven prompt: String) -> Int {
             // Rteurn that input and stop looping if an Int is given.
             return userInput
         }
-        // Otherwise pritn an error message and keep looping.
+        // Otherwise print an error message and keep looping.
         print("Invalid. Please enter a positive integer.")
     }
 }
@@ -240,6 +240,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
         var availability: String = "Not available"
         // Determine the books avaialbility.
         if book.isAvailable(loans: loans) {
+            // set default availability as availble.
             availability = "Available"
         }
         // Print the book's details and its availability.
@@ -250,19 +251,24 @@ func viewBooks(books: [Book], loans: [Loan]) {
 
 /// View all of the borrowers in the system.
 /// 
-/// - Parameter borrowers: The array of all borrowers in the library.
-/// 
+/// - Parameters:
+///   - borrowers: The array of all borrowers in the library.
+///   - loans: The array of all the loans in the library.
 func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
+
     // Print a heading.
     print(
         """
         Borrowers list:
         ---------------------
         """)
+
     // Print each borrower in the list, sorted by ID number. 
     for borrower in borrowers.sorted(by: { $0.id < $1.id }) {
+
         // Calculate the number of loans the borrower currently has out. 
         let currentLoans: Int = borrower.currentLoans(loans: loans)
+
         // Print the borrower's details and their number of current loans.
         print("\(borrower) | \(currentLoans) books on loan.")
     }
@@ -270,33 +276,49 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
 
 /// Add a book to the library. 
 /// 
-/// - Parameter books:
+/// - Parameter books: The array of all the books in the library.
 func addBooks(to books: inout [Book]) {
+
+    // Print a heading.
     print(
         """
         Add a book:
         ------------------
         """)
 
+    // Make the ID of the new book 1 more than the current highest ID number.
     let id = (books.map { $0.id }.max() ?? 0) + 1
+
+    // Gte input for the new book's title.
     let title: String = input(forNotNullString: "Enter book title: ")
+
+    // Get input for the new book's author name.
     let author: String = input(forNotNullString: "Enter Author's name: ")
 
+    // Create the new book.
     let newBook: Book = Book(id: id, title: title, author: author, exists: true)
+
+    // Add the new book to the library.
     books.append(newBook)
+
+    // Print the new book's details and comfirmation that it was added.
     print("\(newBook) was added")
 
 }
 
-///
-/// - Parameter books:
+/// Remove a boomk from the library.
+/// 
+/// - Parameter books:The array of all the books in the library. 
 func removeBook(from books: inout [Book]) {
+
+    // Print a heading.
     print(
         """
         Remove a book: (This will not remove the book from loan history.)
         -------------------------------------------------------------------
         """)
 
+    // Loop until a valid input is given.
     while true {
         guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: "),
             idToRemove > 0
