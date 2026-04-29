@@ -7,7 +7,7 @@ import Foundation
 import GRDB
 
 /// A Borrower who takes out loans.
-struct Borrower: Identifiable, CustomStringConvertible {
+struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "Borrower"
 
     /// The Borrower ID.
@@ -28,10 +28,17 @@ struct Borrower: Identifiable, CustomStringConvertible {
     func currentLoans(loans: [Loan]) -> Int {
         loans.reduce(0) { $0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0) }
     }
+
+        enum CodingKeys: String, CodingKey {
+        case id = "Borrower ID"
+        case name = "Name"
+    }
+
 }
 
 /// A book in the library.
-struct Book: Identifiable, CustomStringConvertible {
+struct Book: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "Book"
 
     /// The Book ID.
     let id: Int
@@ -59,6 +66,14 @@ struct Book: Identifiable, CustomStringConvertible {
         // Check that the book's id is not in a loan that has not bean returned.
         !loans.contains(where: { $0.bookId == id && !$0.returned })
     }
+
+        enum CodingKeys: String, CodingKey {
+        case id = "Book ID"
+        case title = "Title"
+        case author = "Author"
+        case exists = "Exists"
+    }
+
 }
 
 /// A single loan record of a book.
@@ -92,6 +107,15 @@ struct Loan: Identifiable {
         return
             ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not") Returned. ")
     }
+
+        enum CodingKeys: String, CodingKey {
+        case id = "Loan ID"
+        case borrowerId = "Borrower ID"
+        case bookId = "Book ID"
+        case loanPeriod = "Loan Period"
+        case returned = "Returned"
+    }
+
 }
 
 /// A single option on the action menu option.
