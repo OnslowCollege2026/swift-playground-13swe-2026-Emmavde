@@ -391,10 +391,13 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
         // Make the ID of the new loan 1 more than the current highest ID number.
         let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
+
         // Initalisation of the borrower ID for the new loan.
         var borrowerId: Int = 0
+
         // Initalisation of the book ID for the new loan.
         var bookId: Int = 0
+        
         // Initalisation of the loan period for the new loan.
         var loanPeriod: Int = 0
 
