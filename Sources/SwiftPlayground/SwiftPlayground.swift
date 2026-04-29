@@ -55,7 +55,7 @@ struct Book: Identifiable, CustomStringConvertible {
     /// - Parameter loans: The list of loan records the book is checked against.
     /// - Returns: A boolean value of whether the book is available or not.
     func isAvailable(loans: [Loan]) -> Bool {
-        
+
         // Check that the book's id is not in a loan that has not bean returned.
         !loans.contains(where: { $0.bookId == id && !$0.returned })
     }
@@ -119,7 +119,7 @@ func input(forString prompt: String) -> String? {
 }
 
 /// Gets user input in the form of a string, repeating until not null input is given.
-/// 
+///
 /// - Parameter prompt: The prompt displayed to the user.
 /// - Returns: The string the user inputted.
 func input(forNotNullString prompt: String) -> String {
@@ -141,7 +141,7 @@ func input(forNotNullString prompt: String) -> String {
 /// Get user input in the form of an integer.
 ///
 /// - Parameter prompt: The prompt displayed to the user.
-/// - Returns: The user's input as an integer value. 
+/// - Returns: The user's input as an integer value.
 func input(forInt prompt: String) -> Int? {
     // Allow the user to enter an input.
     if let userInput = input(forString: prompt), let intInput = Int(userInput) {
@@ -155,7 +155,7 @@ func input(forInt prompt: String) -> Int? {
 }
 
 /// Gets user input in the form of an integer, repeating until an integer is given.
-/// 
+///
 /// - Parameter prompt: The prompt displayed to the user.
 /// - Returns: The user's input as an integer value.
 func input(loopUntilPositiveIntGiven prompt: String) -> Int {
@@ -202,7 +202,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
     // An empty array for the filtered books.
     var filteredBooks: [Book] = []
 
-    // A varaiable that controls the input loop. 
+    // A varaiable that controls the input loop.
     var looping: Bool = true
     // Loop until a valid input is given.
     while looping {
@@ -216,13 +216,13 @@ func viewBooks(books: [Book], loans: [Loan]) {
             filteredBooks = books.filter({ $0.exists })
             // Stop looping.
             looping = false
-        // If the user enter 'b'
+            // If the user enter 'b'
         } else if optionInput.lowercased() == "b" {
             // Filter for books that exist and are currently available.
             filteredBooks = books.filter({ $0.exists && $0.isAvailable(loans: loans) })
             // Stop looping
             looping = false
-        // If input is invalid, print an error message and continue looping.
+            // If input is invalid, print an error message and continue looping.
         } else {
             print("Invalid. Enter 'a' or 'b'.")
         }
@@ -250,7 +250,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
 }
 
 /// View all of the borrowers in the system.
-/// 
+///
 /// - Parameters:
 ///   - borrowers: The array of all borrowers in the library.
 ///   - loans: The array of all the loans in the library.
@@ -263,10 +263,10 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
         ---------------------
         """)
 
-    // Print each borrower in the list, sorted by ID number. 
+    // Print each borrower in the list, sorted by ID number.
     for borrower in borrowers.sorted(by: { $0.id < $1.id }) {
 
-        // Calculate the number of loans the borrower currently has out. 
+        // Calculate the number of loans the borrower currently has out.
         let currentLoans: Int = borrower.currentLoans(loans: loans)
 
         // Print the borrower's details and their number of current loans.
@@ -274,8 +274,8 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
     }
 }
 
-/// Add a book to the library. 
-/// 
+/// Add a book to the library.
+///
 /// - Parameter books: The array of all the books in the library.
 func addBooks(to books: inout [Book]) {
 
@@ -307,8 +307,8 @@ func addBooks(to books: inout [Book]) {
 }
 
 /// Remove a boomk from the library.
-/// 
-/// - Parameter books:The array of all the books in the library. 
+///
+/// - Parameter books:The array of all the books in the library.
 func removeBook(from books: inout [Book]) {
 
     // Print a heading.
@@ -320,18 +320,24 @@ func removeBook(from books: inout [Book]) {
 
     // Loop until a valid input is given.
     while true {
+
+        // Get input for the ID number of the book, if it is valid, stop looping.
         guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: "),
             idToRemove > 0
         else {
+            // If the ID is not a positive integer, display an error message and continue looping.
             print("Please enter a valid ID number.\n")
             continue
         }
 
+        // Check if there is an existing book of the given ID.
         if let IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }))
         {
+            // If there is, remove the book.
             books[IndexToRemove].exists = false
             print("\(books[IndexToRemove]) has been removed from the library.")
 
+            // If not, print an error message.
         } else {
             print("Book does not exist or has already been removed.")
         }
@@ -339,214 +345,292 @@ func removeBook(from books: inout [Book]) {
     }
 }
 
-/// 
-/// 
+/// Borrow a book from the library (add a loan)
+///
 /// - Parameters:
-///   - books:
-///   - borrowers:
-///   - loans:
+///   - books: The array of all the books in the library.
+///   - borrowers: The array of all the borrowers of the library.
+///   - loans: The array of all loan records that the new loan is added to.
 func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout [Loan]) {
+    // Print a heading.
     print(
         """
         \nBorrow a book:
         -------------------
         """)
 
+    // If there are no available books in the library, tell the user.
     if books.filter({ $0.isAvailable(loans: loans) }).isEmpty {
         print("Unfortunately all books are on loan. ")
     } else {
 
+        // Make the ID of the new loan 1 more than the current highest ID number.
         let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
+        // Initalisation of the borrower ID for the new loan.
         var borrowerId: Int = 0
+        // Initalisation of the book ID for the new loan.
         var bookId: Int = 0
+        // Initalisation of the loan period for the new loan.
         var loanPeriod: Int = 0
 
+        // Loop until a valid Borrower ID is given.
         while true {
+            // Ask the user for their borrower ID.
             let id: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
+            // If there exists a borrower of that ID, stop looping
             if borrowers.contains(where: { $0.id == id }) {
+                // Assign the borrower ID of the new loan as the user's input.
                 borrowerId = id
                 break
+                // If not borrower of this ID exists, keep looping.
             } else {
                 print("No borrower of this ID exists.")
             }
         }
 
+        // Loop until a valid Book ID is given.
         while true {
+            // Ask the user for the ID of the book they want to borrow,
+            // repeating until a positve number is given.
             let id: Int = input(
                 loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
+
+            // Check if there exists a book of this ID, and it is avalailable.
             if let bookToBorrow = books.first(where: { $0.id == id }),
                 bookToBorrow.exists,
                 bookToBorrow.isAvailable(loans: loans)
             {
+                // If there is, assign the borrower ID of the new loan as the user's input.
                 bookId = id
+                // Stop looping.
                 break
+                // Otherwise, print an error message, and keep looping.
             } else {
                 print("No book of this ID exists, or the book is currently unavialable.")
             }
         }
 
+        // Loop until a valid loan period is given.
         while true {
+            // Ask the user for the loan period.
             loanPeriod = input(
                 loopUntilPositiveIntGiven: """
                     How many days do you wish to loan the book? (maximum loan period is \(maxLoanPeriod) days): 
                     """)
 
+            // If the loan period is valid, stop looping.
             if loanPeriod > 0 && loanPeriod <= maxLoanPeriod {
                 break
+                // Otherwise, print an error message and keep looping.
             } else {
                 print("The maximum loan period is \(maxLoanPeriod) days.")
             }
         }
 
+        // Create the new loan using the inputted information.
         let newLoan: Loan = Loan(
             id: loanId, borrowerId: borrowerId, bookId: bookId, loanPeriod: loanPeriod,
             returned: false)
 
+        // Add the new loan to the loan records.
         loans.append(newLoan)
+        // Print the new loan's details and a comfirmation message.
         print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
     }
 
 }
 
+/// Return a book to the library.
 ///
 /// - Parameters:
-///   - loans:
-///   - books:
+///   - loans: The array of all loan records.
+///   - books: The array of all books in the library.
 func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
+
+    // Print a heading.
     print(
         """
         Return a book:
         --------------------
         """)
 
+    // Ask the user for the ID of the book being returned.
     let id = input(loopUntilPositiveIntGiven: "Enter the ID of the book you are returning: ")
 
+    // Check if a book of that ID is on loan.
     if let indexToedit: Int = loans.firstIndex(where: { $0.bookId == id && !$0.returned }) {
+
+        // Return the book.
         loans[indexToedit].returned = true
+
+        // Print the details of the returned loan.
         print(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
+
+        // If the book couldn't be returned, print an error message.
     } else {
         print("This book is not on loan, or does not exist.")
     }
 }
 
+/// Add a borrower to the library system.
 ///
-/// - Parameter borrowers:
+/// - Parameter borrowers: The array of all borrowers of the library.
 func addBorrower(to borrowers: inout [Borrower]) {
 
+    // Print a heading.
     print(
         """
         Register a borrower:
         -----------------------
         """)
 
+    // Make the ID of the new loan 1 more than the current highest ID number.
     let id = (borrowers.map { $0.id }.max() ?? 0) + 1
+
+    // Get input for the new borrower's name, looping until a name is given.
     let name: String = input(forNotNullString: "Enter the borrower's name: ")
 
+    // Create the instance of the new borrower.
     let newBorrower: Borrower = Borrower(id: id, name: name)
+
+    // Add the new borrower to the library.
     borrowers.append(newBorrower)
+
+    // Print the new borrower's details, and a comfirmation message.
     print("\(newBorrower) was added")
 
 }
 
+/// Edit a borrower's details.
 ///
-/// - Parameter borrowers:
+/// - Parameter borrowers: The array of all borrrower's of the library.
 func editBorrower(from borrowers: inout [Borrower]) {
+
+    // Print a heading.
     print(
         """
         Edit borrower details:
         -------------------------
         """)
 
-    var idToEdit: Int = 0
+    // Get input for the ID of the borrower being edited,
+    // looping until a positive integer is given.
+    let idToEdit = input(loopUntilPositiveIntGiven: "Enter the borrower's ID number: ")
 
-    while true {
-        guard let idInput = input(forInt: "Enter the borrower's ID number: "), idInput > 0 else {
-            print("Please enter a valid ID number.\n")
-            continue
-        }
-        idToEdit = idInput
-        break
-    }
-
+    // Check if a borrower of that ID exists.
     if let indexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
+
+        // If they exist, get input for their updated name.
         let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
+
+        // Change the borrower's name to the updated name.
         borrowers[indexToedit].name = newName
 
+        // If no borrower of the given ID exists, print an error message.
     } else {
         print("There is no borrower with that ID.")
     }
 
 }
 
+/// Search for a book in the library.
 ///
-/// - Parameter books:
+/// - Parameter books: The array of all the books in the library.
 func searchBooks(books: [Book]) {
+
+    // Print a heading.
     print(
         """
         \nSearch for books:
         ---------------------
         """)
-    let keyword: String = input(forNotNullString: "Enter a title, author or keyword to search: ")
-        .lowercased()
 
+    // Get user input of a keyword to search for, looping until a keyword is given.
+    let keyword: String = input(
+        forNotNullString:
+            "Enter a title, author or keyword to search: "
+    )
+    .lowercased()
+
+    // Create an array of results for the search.
     let results: [Book] = books.filter {
+        // Add existing books to the array if their title or author name contain the keyword.
         ($0.title.lowercased().contains(keyword) || $0.author.lowercased().contains(keyword))
             && $0.exists
     }
 
+    // If there were no search results, tell the user.
     if results.isEmpty {
         print("No books contain that keyword.")
     } else {
+        // Display the number of book results found.
         print("\(results.count) results found:\n")
+
+        // Print the details of each book from the results.
         for book in results {
             print(book)
         }
     }
 }
 
+/// Search for a borrower.
 ///
 /// - Parameter borrowers:
 func searchBorrowers(borrowers: [Borrower]) {
+
+    // Print a heading.
     print(
         """
         \nSearch for borrowers:
         ---------------------
         """)
+
+    // Get user input of a keyword/name to search for, looping until a keyword is given.
     let keyword: String = input(forNotNullString: "Enter a part of the borrower's name: ")
         .lowercased()
 
+    // Create an array of search results.
     let results: [Borrower] = borrowers.filter {
+        // Add a borrower to the results if their name contains the keyword.
         ($0.name.lowercased().contains(keyword))
     }
 
+    // If there were no results, tell the user.
     if results.isEmpty {
         print("No borrower's have that name.")
     } else {
+        // Display the number of borrower results found.
         print("\(results.count) results found:\n")
+
+        // Print the details of each borrower from the results.
         for borrower in results {
             print(borrower)
         }
     }
 }
 
+/// View all loan records of the library.
 ///
 /// - Parameters:
-///   - loans:
-///   - books:
-///   - borrowers:
+///   - loans: The array of all loan records for the library.
+///   - books: The array of all books in the library.
+///   - borrowers: The array of all borrower's of the library.
 func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
+
+    // Print a heading.
     print(
         """
         Loan history:
         ---------------
         """)
 
-    for loan in loans {
+    // Print each the details of each loan record, sorted by loan ID.
+    for loan in loans.sorted(by: { $0.id < $1.id }) {
         print(loan.loanDetails(books: books, borrowers: borrowers))
     }
 }
 
-//
+// The maximum amount in days the a loan can be taken out for.
 let maxLoanPeriod = 21
 
 // The different actions dispalyed in the option menu.
@@ -612,21 +696,21 @@ struct SwiftPlayground {
 
         var running: Bool = true
         while running {
+
+            // Print the menu of actions.
             showActions()
 
-            guard
-                let optionInput: String = input(
-                    forString: "\nEnter option number, or 'done' to finish: ")
-            else {
-                print("Invalid input")
-                continue
-            }
+            // Let the user enter the number of the option they want to select.
+            let optionInput: String = input(
+                forNotNullString: "\nEnter option number, or 'done' to finish: ")
 
+            // If they the user is finished, end the program.
             if optionInput.lowercased() == "done" {
                 running = false
             }
 
             else {
+                // Convert the user's input into an integer, and call the function of the corresponding option number.
                 if let optionNumber = Int(optionInput) {
 
                     switch optionNumber {
@@ -641,8 +725,12 @@ struct SwiftPlayground {
                     case 9: searchBooks(books: books)
                     case 10: searchBorrowers(borrowers: borrowers)
                     case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
+
+                    // If the number wasn't an option, print an error message.
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
                     }
+
+                    // If the input was invalid, print an error message.
                 } else {
                     print("Invalid. Please enter a number from the menu, or 'done'.")
                 }
