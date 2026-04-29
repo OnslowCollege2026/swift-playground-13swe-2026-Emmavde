@@ -9,7 +9,7 @@ import GRDB
 /// A Borrower who takes out loans.
 struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord
 {
-    static let databaseTableName = "Borrower"
+    static let databaseTableName = "Borrowers"
 
     /// The Borrower ID.
     let id: Int
@@ -39,7 +39,7 @@ struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord
 
 /// A book in the library.
 struct Book: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord {
-    static let databaseTableName = "Book"
+    static let databaseTableName = "Books"
 
     /// The Book ID.
     let id: Int
@@ -78,8 +78,8 @@ struct Book: Identifiable, CustomStringConvertible, Codable, FetchableRecord, Pe
 }
 
 /// A single loan record of a book.
-struct Loan: Identifiable {
-    static let databaseTableName = "Loan"
+struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "Loans"
 
     /// The Loan ID.
     let id: Int
@@ -397,7 +397,7 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
         // Initalisation of the book ID for the new loan.
         var bookId: Int = 0
-        
+
         // Initalisation of the loan period for the new loan.
         var loanPeriod: Int = 0
 
@@ -676,53 +676,106 @@ let actionOptions: [menuOption] = [
     menuOption(optionNumber: 11, description: "View loan records."),
 ]
 
-// Some books to add to the library for testing.
-let preSetBooks: [Book] = [
-    Book(id: 1, title: "1984", author: "George Orwell", exists: true),
-    Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew", exists: true),
-    Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
-    Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
-    Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
-    Book(
-        id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
-    Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
-    Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
-    Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
-    Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu", exists: true),
-]
+// // Some books to add to the library for testing.
+// let preSetBooks: [Book] = [
+//     Book(id: 1, title: "1984", author: "George Orwell", exists: true),
+//     Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew", exists: true),
+//     Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
+//     Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
+//     Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
+//     Book(
+//         id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
+//     Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
+//     Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
+//     Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
+//     Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu", exists: true),
+// ]
 
-// Some borrower data to add to the library for testing.
-let preSetBorrowers: [Borrower] = [
-    Borrower(id: 1, name: "Alice Johnson"),
-    Borrower(id: 2, name: "Bo-Katan Kryze"),
-    Borrower(id: 3, name: "Charlotte Smith"),
-    Borrower(id: 4, name: "Daniel Lee"),
-    Borrower(id: 5, name: "Gamora"),
-    Borrower(id: 6, name: "Gandalf"),
-]
+// // Some borrower data to add to the library for testing.
+// let preSetBorrowers: [Borrower] = [
+//     Borrower(id: 1, name: "Alice Johnson"),
+//     Borrower(id: 2, name: "Bo-Katan Kryze"),
+//     Borrower(id: 3, name: "Charlotte Smith"),
+//     Borrower(id: 4, name: "Daniel Lee"),
+//     Borrower(id: 5, name: "Gamora"),
+//     Borrower(id: 6, name: "Gandalf"),
+// ]
 
-// Some past loan data to add to the library for testing.
-let preSetLoans: [Loan] = [
-    Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
-    Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
-    Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
-    Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
-]
+// // Some past loan data to add to the library for testing.
+// let preSetLoans: [Loan] = [
+//     Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
+//     Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
+//     Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
+//     Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
+// ]
 
 @main
 struct SwiftPlayground {
     static func main() {
 
+        // Create the database Queue.
+        let dbPath = "./Sources/SwiftPlayground/library.db"
+        guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
+            // Display an error message if the databse coulnd not be opened.
+            fatalError("Could not open database.")
+        }
+
         // All of the books, available and on loan, in the library.
-        var books: [Book] = preSetBooks
+        var books: [Book] = []
 
         // All of the borrowers/members of the library
-        var borrowers: [Borrower] = preSetBorrowers
+        var borrowers: [Borrower] = []
 
         // All of the past loans from the library.
-        var loans: [Loan] = preSetLoans
+        var loans: [Loan] = []
 
+        do {
+            // Fetch all of the data from the Books table,
+            // and add it to the books array.
+            books = try dbQueue.read { db in
+                try Book.fetchAll(db)
+            }
+
+            // Fetch all of the data from the Borrowers table,
+            // and add it to the borrowers array.
+            borrowers = try dbQueue.read { db in
+                try Borrower.fetchAll(db)
+            }
+
+            // Fetch all of the data from the Loans table,
+            // and add it to the loans array.
+            loans = try dbQueue.read { db in
+                try Loan.fetchAll(db)
+            }
+
+            // If any of the fetching fails, print an error message.
+        } catch { print("An error with the database occured. Error:\(error)") }
+
+        func updateDatabase() {
+            do {
+                try dbQueue.write { db in
+
+                    for book in books {
+                        try book.save(db)
+                    }
+
+                    for borrower in borrowers {
+                        try borrower.save(db)
+                    }
+
+                    for loan in loans {
+                        try loan.save(db)
+                    }
+                }
+
+            } catch { print("An error with the database occured. Error:\(error)") }
+
+        }
+
+        // A variable that controls the main loop.
         var running: Bool = true
+
+        // Loop until the user stops the program.
         while running {
 
             // Print the menu of actions.
@@ -743,13 +796,25 @@ struct SwiftPlayground {
 
                     switch optionNumber {
                     case 1: viewBooks(books: books, loans: loans)
-                    case 2: addBooks(to: &books)
-                    case 3: removeBook(from: &books)
-                    case 4: borrowBook(from: books, from: borrowers, to: &loans)
-                    case 5: returnBook(to: &loans, books: books, borrowers: borrowers)
+                    case 2:
+                        addBooks(to: &books)
+                        updateDatabase()
+                    case 3:
+                        removeBook(from: &books)
+                        updateDatabase()
+                    case 4:
+                        borrowBook(from: books, from: borrowers, to: &loans)
+                        updateDatabase()
+                    case 5:
+                        returnBook(to: &loans, books: books, borrowers: borrowers)
+                        updateDatabase()
                     case 6: viewBorrowers(borrowers: borrowers, loans: loans)
-                    case 7: addBorrower(to: &borrowers)
-                    case 8: editBorrower(from: &borrowers)
+                    case 7:
+                        addBorrower(to: &borrowers)
+                        updateDatabase()
+                    case 8:
+                        editBorrower(from: &borrowers)
+                        updateDatabase()
                     case 9: searchBooks(books: books)
                     case 10: searchBorrowers(borrowers: borrowers)
                     case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
