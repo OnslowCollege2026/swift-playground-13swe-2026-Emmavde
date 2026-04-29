@@ -7,7 +7,8 @@ import Foundation
 import GRDB
 
 /// A Borrower who takes out loans.
-struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord {
+struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord, PersistableRecord
+{
     static let databaseTableName = "Borrower"
 
     /// The Borrower ID.
@@ -29,7 +30,7 @@ struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord
         loans.reduce(0) { $0 + (($1.borrowerId == id && !$1.returned) ? 1 : 0) }
     }
 
-        enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id = "Borrower ID"
         case name = "Name"
     }
@@ -67,7 +68,7 @@ struct Book: Identifiable, CustomStringConvertible, Codable, FetchableRecord, Pe
         !loans.contains(where: { $0.bookId == id && !$0.returned })
     }
 
-        enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id = "Book ID"
         case title = "Title"
         case author = "Author"
@@ -108,7 +109,7 @@ struct Loan: Identifiable {
             ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not") Returned. ")
     }
 
-        enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id = "Loan ID"
         case borrowerId = "Borrower ID"
         case bookId = "Book ID"
