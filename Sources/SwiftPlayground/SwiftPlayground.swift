@@ -676,38 +676,7 @@ let actionOptions: [menuOption] = [
     menuOption(optionNumber: 11, description: "View loan records."),
 ]
 
-// // Some books to add to the library for testing.
-// let preSetBooks: [Book] = [
-//     Book(id: 1, title: "1984", author: "George Orwell", exists: true),
-//     Book(id: 2, title: "The Ultimate Guide to Swordfish", author: "Victoria Chew", exists: true),
-//     Book(id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", exists: true),
-//     Book(id: 4, title: "Pride and Prejudice", author: "Jane Austen", exists: true),
-//     Book(id: 5, title: "A Study in Scarlet", author: "Sir Arthur Conan Doyle", exists: true),
-//     Book(
-//         id: 6, title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", exists: true),
-//     Book(id: 7, title: "The Lord of the Rings", author: "J.R.R. Tolkien", exists: true),
-//     Book(id: 8, title: "Animal Farm", author: "George Orwell", exists: true),
-//     Book(id: 9, title: "Holes", author: "Louis Sachar", exists: true),
-//     Book(id: 10, title: "The 3 Body Problem", author: "Cixin Liu", exists: true),
-// ]
 
-// // Some borrower data to add to the library for testing.
-// let preSetBorrowers: [Borrower] = [
-//     Borrower(id: 1, name: "Alice Johnson"),
-//     Borrower(id: 2, name: "Bo-Katan Kryze"),
-//     Borrower(id: 3, name: "Charlotte Smith"),
-//     Borrower(id: 4, name: "Daniel Lee"),
-//     Borrower(id: 5, name: "Gamora"),
-//     Borrower(id: 6, name: "Gandalf"),
-// ]
-
-// // Some past loan data to add to the library for testing.
-// let preSetLoans: [Loan] = [
-//     Loan(id: 1, borrowerId: 1, bookId: 2, loanPeriod: 14, returned: false),
-//     Loan(id: 2, borrowerId: 3, bookId: 4, loanPeriod: 7, returned: false),
-//     Loan(id: 3, borrowerId: 2, bookId: 7, loanPeriod: 21, returned: false),
-//     Loan(id: 4, borrowerId: 4, bookId: 3, loanPeriod: 10, returned: true),
-// ]
 
 @main
 struct SwiftPlayground {
