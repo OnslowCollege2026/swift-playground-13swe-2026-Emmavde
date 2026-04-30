@@ -228,9 +228,9 @@ func showActions() {
     // Print a heading.
     print(
         """
-        \n------------------------------------
+        \n\(divider)
         Choose an action from the menu:
-        ------------------------------------
+        \(divider)
         """)
 
     // Print each option along with its option number in a list.
@@ -284,7 +284,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
     print(
         """
         \nBook list:
-        ----------------
+        \(divider)
         """)
 
     // Print each of the filtered for books in a list, sorted by ID number.
@@ -300,7 +300,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
             """
             \(book)
             \(availability)
-            ----------------------------------------------------
+            \(divider)
             """)
     }
 
@@ -317,7 +317,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
     print(
         """
         \nBorrowers list:
-        ---------------------
+        \(divider)
         """)
 
     // Print each borrower in the list, sorted by ID number.
@@ -331,7 +331,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
             """
             \(borrower)
             \(currentLoans) books on loan.
-            ----------------------------------------------------
+            \(divider)
             """)
     }
 }
@@ -345,7 +345,7 @@ func addBook(to books: inout [Book]) {
     print(
         """
         \nAdd a book:
-        ------------------
+        \(divider)
         """)
 
     // Make the ID of the new book 1 more than the current highest ID number.
@@ -367,9 +367,9 @@ func addBook(to books: inout [Book]) {
     print(
         """
 
-        ----------------------------------------------------
+        \(divider)
         \(newBook) 
-        ----------------------------------------------------
+        \(divider)
         was added
         """)
 
@@ -383,8 +383,9 @@ func removeBook(from books: inout [Book]) {
     // Print a heading.
     print(
         """
-        \nRemove a book: (This will not remove the book from loan history.)
-        -------------------------------------------------------------------
+        \nRemove a book:
+        (This will not remove the book from loan history.)
+        \(divider)
         """)
 
     // Loop until a valid input is given.
@@ -407,9 +408,9 @@ func removeBook(from books: inout [Book]) {
             print(
                 """
 
-                ----------------------------------------------------
+                \(divider)
                 \(books[IndexToRemove]) 
-                ----------------------------------------------------
+                \(divider)
                 has been removed from the library.
                 """)
 
@@ -432,7 +433,7 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
     print(
         """
         \nBorrow a book:
-        -------------------
+        \(divider)
         """)
 
     // If there are no available books in the library, tell the user.
@@ -517,9 +518,9 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         print(
             """
 
-            ----------------------------------------------------
+            \(divider)
             \(newLoan.loanDetails(books: books, borrowers: borrowers))
-            ----------------------------------------------------
+            \(divider)
             """)
     }
 
@@ -536,7 +537,7 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
     print(
         """
         \nReturn a book:
-        --------------------
+        \(divider)
         """)
 
     // Ask the user for the ID of the book being returned.
@@ -552,9 +553,9 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
         print(
             """
 
-            ----------------------------------------------------
+            \(divider)
             \(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
-            ----------------------------------------------------
+            \(divider)
             """)
 
         // If the book couldn't be returned, print an error message.
@@ -572,7 +573,7 @@ func addBorrower(to borrowers: inout [Borrower]) {
     print(
         """
         \nRegister a borrower:
-        -----------------------
+        \(divider)
         """)
 
     // Make the ID of the new loan 1 more than the current highest ID number.
@@ -591,9 +592,9 @@ func addBorrower(to borrowers: inout [Borrower]) {
     print(
         """
 
-        ----------------------------------------------------
+        \(divider)
         \(newBorrower) 
-        ----------------------------------------------------
+        \(divider)
         was added
         """)
 
@@ -608,7 +609,7 @@ func editBorrower(from borrowers: inout [Borrower]) {
     print(
         """
         \nEdit borrower details:
-        -------------------------
+        \(divider)
         """)
 
     // Get input for the ID of the borrower being edited,
@@ -642,7 +643,7 @@ func searchBooks(books: [Book]) {
     print(
         """
         \nSearch for books:
-        ---------------------
+        \(divider)
         """)
 
     // Get user input of a keyword to search for, looping until a keyword is given.
@@ -668,7 +669,7 @@ func searchBooks(books: [Book]) {
 
         // Print the details of each book from the results.
         for book in results {
-            print("----------------------------------------------------")
+            print(divider)
             print(book)
         }
     }
@@ -683,7 +684,7 @@ func searchBorrowers(borrowers: [Borrower]) {
     print(
         """
         \nSearch for borrowers:
-        ---------------------
+        \(divider)
         """)
 
     // Get user input of a keyword/name to search for, looping until a keyword is given.
@@ -698,14 +699,14 @@ func searchBorrowers(borrowers: [Borrower]) {
 
     // If there were no results, tell the user.
     if results.isEmpty {
-        print("No borrower's have that name.")
+        print("No borrowers have that name.")
     } else {
         // Display the number of borrower results found.
         print("\(results.count) results found:\n")
 
         // Print the details of each borrower from the results.
         for borrower in results {
-            print("----------------------------------------------------")
+            print(divider)
             print(borrower)
         }
     }
@@ -723,20 +724,23 @@ func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
     print(
         """
         \nLoan history:
-        ---------------
+        \(divider)
         """)
 
     // Print each the details of each loan record, sorted by loan ID.
     for loan in loans.sorted(by: { $0.id < $1.id }) {
         print(loan.loanDetails(books: books, borrowers: borrowers))
-        print("----------------------------------------------------")
+        print(divider)
     }
 }
 
-// The maximum amount in days the a loan can be taken out for.
+/// The maximum amount in days the a loan can be taken out for.
 let maxLoanPeriod = 21
 
-// The different actions displayed in the option menu.
+/// A divider line printed between outputs for clarity.
+let divider: String = "------------------------------------------------------------"
+
+/// The different actions displayed in the option menu.
 let menuOptions: [MenuOption] = [
     MenuOption(optionNumber: .viewBooks, description: "View books"),
     MenuOption(optionNumber: .addBook, description: "Add a book"),
@@ -819,8 +823,15 @@ struct SwiftPlayground {
 
                 // If an error occured, print the error and a message.
             } catch { print("An error with the database occured. Error:\(error)") }
-
         }
+
+        // Print a welcome message.
+        print(
+            """
+             --------------------------------
+            / WELCOME TO THE LIBRARY SYSTEM /
+            -------------------------------
+            """)
 
         // A variable that controls the main loop.
         var running: Bool = true
