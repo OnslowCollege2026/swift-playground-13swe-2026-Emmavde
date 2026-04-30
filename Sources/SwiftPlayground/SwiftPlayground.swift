@@ -120,16 +120,16 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
 }
 
 /// A single option on the action menu.
-struct menuOption {
+struct MenuOption {
     // The option's number it is selected by.
-    let optionNumber: menuOptionNumber
+    let optionNumber: MenuOptionNumber
 
     // The description of what action it performs.
     let description: String
 }
 
 // The possible option numbers for the action menu.
-enum menuOptionNumber: Int {
+enum MenuOptionNumber: Int {
     case viewBooks = 1
     case addBook = 2
     case removeBook = 3
@@ -278,7 +278,7 @@ func viewBooks(books: [Book], loans: [Loan]) {
     // Print each of the filtered for books in a list, sorted by ID number.
     for book in filteredBooks.sorted(by: { $0.id < $1.id }) {
         var availability: String = "Not available"
-        // Determine the books avaialbility.
+        // Determine the books availability.
         if book.isAvailable(loans: loans) {
             // set default availability as availble.
             availability = "Available"
@@ -329,7 +329,7 @@ func addBook(to books: inout [Book]) {
     // Make the ID of the new book 1 more than the current highest ID number.
     let id = (books.map { $0.id }.max() ?? 0) + 1
 
-    // Gte input for the new book's title.
+    // Get input for the new book's title.
     let title: String = input(forNotNullString: "Enter book title: ")
 
     // Get input for the new book's author name.
@@ -341,7 +341,7 @@ func addBook(to books: inout [Book]) {
     // Add the new book to the library.
     books.append(newBook)
 
-    // Print the new book's details and comfirmation that it was added.
+    // Print the new book's details and confirmation that it was added.
     print("\(newBook) was added")
 
 }
@@ -477,7 +477,7 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
         // Add the new loan to the loan records.
         loans.append(newLoan)
-        // Print the new loan's details and a comfirmation message.
+        // Print the new loan's details and a confirmation message.
         print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
     }
 
@@ -539,7 +539,7 @@ func addBorrower(to borrowers: inout [Borrower]) {
     // Add the new borrower to the library.
     borrowers.append(newBorrower)
 
-    // Print the new borrower's details, and a comfirmation message.
+    // Print the new borrower's details, and a confirmation message.
     print("\(newBorrower) was added")
 
 }
@@ -679,18 +679,18 @@ func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
 let maxLoanPeriod = 21
 
 // The different actions displayed in the option menu.
-let menuOptions: [menuOption] = [
-    menuOption(optionNumber: .viewBooks, description: "View books"),
-    menuOption(optionNumber: .addBook, description: "Add a book"),
-    menuOption(optionNumber: .removeBook, description: "Remove a book"),
-    menuOption(optionNumber: .borrowBook, description: "Borrow a book"),
-    menuOption(optionNumber: .returnBook, description: "return a book"),
-    menuOption(optionNumber: .viewBorrowers, description: "View borrowers"),
-    menuOption(optionNumber: .addBorrower, description: "Register a borrower"),
-    menuOption(optionNumber: .editBorrower, description: "Edit a borrower's details"),
-    menuOption(optionNumber: .searchBooks, description: "Search books"),
-    menuOption(optionNumber: .searchBorrowers, description: "Search Borrowers"),
-    menuOption(optionNumber: .viewLoans, description: "View loan records."),
+let menuOptions: [MenuOption] = [
+    MenuOption(optionNumber: .viewBooks, description: "View books"),
+    MenuOption(optionNumber: .addBook, description: "Add a book"),
+    MenuOption(optionNumber: .removeBook, description: "Remove a book"),
+    MenuOption(optionNumber: .borrowBook, description: "Borrow a book"),
+    MenuOption(optionNumber: .returnBook, description: "return a book"),
+    MenuOption(optionNumber: .viewBorrowers, description: "View borrowers"),
+    MenuOption(optionNumber: .addBorrower, description: "Register a borrower"),
+    MenuOption(optionNumber: .editBorrower, description: "Edit a borrower's details"),
+    MenuOption(optionNumber: .searchBooks, description: "Search books"),
+    MenuOption(optionNumber: .searchBorrowers, description: "Search Borrowers"),
+    MenuOption(optionNumber: .viewLoans, description: "View loan records."),
 ]
 
 @main
@@ -789,33 +789,33 @@ struct SwiftPlayground {
                     // Call the function of the corresponding option number,
                     // based on the menuOptionNumber enum.
                     switch optionNumber {
-                    case menuOptionNumber.viewBooks.rawValue:
+                    case MenuOptionNumber.viewBooks.rawValue:
                         viewBooks(books: books, loans: loans)
-                    case menuOptionNumber.addBook.rawValue:
+                    case MenuOptionNumber.addBook.rawValue:
                         addBook(to: &books)
                         updateDatabase()
-                    case menuOptionNumber.removeBook.rawValue:
+                    case MenuOptionNumber.removeBook.rawValue:
                         removeBook(from: &books)
                         updateDatabase()
-                    case menuOptionNumber.borrowBook.rawValue:
+                    case MenuOptionNumber.borrowBook.rawValue:
                         borrowBook(from: books, from: borrowers, to: &loans)
                         updateDatabase()
-                    case menuOptionNumber.returnBook.rawValue:
+                    case MenuOptionNumber.returnBook.rawValue:
                         returnBook(to: &loans, books: books, borrowers: borrowers)
                         updateDatabase()
-                    case menuOptionNumber.viewBorrowers.rawValue:
+                    case MenuOptionNumber.viewBorrowers.rawValue:
                         viewBorrowers(borrowers: borrowers, loans: loans)
-                    case menuOptionNumber.addBorrower.rawValue:
+                    case MenuOptionNumber.addBorrower.rawValue:
                         addBorrower(to: &borrowers)
                         updateDatabase()
-                    case menuOptionNumber.editBorrower.rawValue:
+                    case MenuOptionNumber.editBorrower.rawValue:
                         editBorrower(from: &borrowers)
                         updateDatabase()
-                    case menuOptionNumber.searchBooks.rawValue:
+                    case MenuOptionNumber.searchBooks.rawValue:
                         searchBooks(books: books)
-                    case menuOptionNumber.searchBorrowers.rawValue:
+                    case MenuOptionNumber.searchBorrowers.rawValue:
                         searchBorrowers(borrowers: borrowers)
-                    case menuOptionNumber.viewLoans.rawValue:
+                    case MenuOptionNumber.viewLoans.rawValue:
                         viewLoans(loans: loans, books: books, borrowers: borrowers)
 
                     // If the number wasn't an option, print an error message.
