@@ -19,7 +19,10 @@ struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord
 
     /// The borrower's ID and name formated in a string.
     var description: String {
-        "ID: \(id) | Name: \(name) "
+        """
+        ID: \(id)
+        Name: \(name)
+        """
     }
 
     /// Calculates the number of books a borrower currently has on loan.
@@ -55,7 +58,11 @@ struct Book: Identifiable, CustomStringConvertible, Codable, FetchableRecord, Pe
 
     /// Formats the book's ID, title and author in a string.
     var description: String {
-        "ID: \(id) | Title: \(title) | Author: \(author)"
+        """
+        ID: \(id)
+        Title: \(title)
+        Author: \(author)
+        """
     }
 
     /// Checks whether the book is available to borrow or not.
@@ -106,7 +113,12 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
         let title: String = books.first(where: { $0.id == bookId })?.title ?? ""
         let borrowerName: String = borrowers.first(where: { $0.id == borrowerId })?.name ?? ""
         return
-            ("Loan ID: \(id) | '\(title)' loaned to \(borrowerName) for \(loanPeriod) days. \(returned ? "" : "Not") Returned. ")
+            ("""
+        Loan ID: \(id)
+        Book: '\(title)' 
+        Loaned to \(borrowerName) for \(loanPeriod) days.
+        \(returned ? "" : "Not ")Returned. 
+        """)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -284,7 +296,12 @@ func viewBooks(books: [Book], loans: [Loan]) {
             availability = "Available"
         }
         // Print the book's details and its availability.
-        print("\(book) | \(availability)")
+        print(
+            """
+            \(book)
+            \(availability)
+            ----------------------------------------------------
+            """)
     }
 
 }
@@ -299,7 +316,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
     // Print a heading.
     print(
         """
-        Borrowers list:
+        \nBorrowers list:
         ---------------------
         """)
 
@@ -310,7 +327,11 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
         let currentLoans: Int = borrower.currentLoans(loans: loans)
 
         // Print the borrower's details and their number of current loans.
-        print("\(borrower) | \(currentLoans) books on loan.")
+        print("""
+        \(borrower)
+        \(currentLoans) books on loan.
+        ----------------------------------------------------
+        """)
     }
 }
 
@@ -322,7 +343,7 @@ func addBook(to books: inout [Book]) {
     // Print a heading.
     print(
         """
-        Add a book:
+        \nAdd a book:
         ------------------
         """)
 
@@ -342,7 +363,13 @@ func addBook(to books: inout [Book]) {
     books.append(newBook)
 
     // Print the new book's details and confirmation that it was added.
-    print("\(newBook) was added")
+    print("""
+
+    ----------------------------------------------------
+    \(newBook) 
+    ----------------------------------------------------
+    was added
+    """)
 
 }
 
@@ -354,7 +381,7 @@ func removeBook(from books: inout [Book]) {
     // Print a heading.
     print(
         """
-        Remove a book: (This will not remove the book from loan history.)
+        \nRemove a book: (This will not remove the book from loan history.)
         -------------------------------------------------------------------
         """)
 
@@ -375,7 +402,13 @@ func removeBook(from books: inout [Book]) {
         {
             // If there is, remove the book.
             books[IndexToRemove].exists = false
-            print("\(books[IndexToRemove]) has been removed from the library.")
+            print("""
+
+            ----------------------------------------------------
+            \(books[IndexToRemove]) 
+            ----------------------------------------------------
+            has been removed from the library.
+            """)
 
             // If not, print an error message.
         } else {
@@ -478,7 +511,12 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         // Add the new loan to the loan records.
         loans.append(newLoan)
         // Print the new loan's details and a confirmation message.
-        print("\n\(newLoan.loanDetails(books: books, borrowers: borrowers))")
+        print("""
+
+        ----------------------------------------------------
+        \(newLoan.loanDetails(books: books, borrowers: borrowers))
+        ----------------------------------------------------
+        """)
     }
 
 }
@@ -493,7 +531,7 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
     // Print a heading.
     print(
         """
-        Return a book:
+        \nReturn a book:
         --------------------
         """)
 
@@ -507,7 +545,12 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
         loans[indexToedit].returned = true
 
         // Print the details of the returned loan.
-        print(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
+        print("""
+
+        ----------------------------------------------------
+        \(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
+        ----------------------------------------------------
+        """)
 
         // If the book couldn't be returned, print an error message.
     } else {
@@ -523,7 +566,7 @@ func addBorrower(to borrowers: inout [Borrower]) {
     // Print a heading.
     print(
         """
-        Register a borrower:
+        \nRegister a borrower:
         -----------------------
         """)
 
@@ -540,7 +583,13 @@ func addBorrower(to borrowers: inout [Borrower]) {
     borrowers.append(newBorrower)
 
     // Print the new borrower's details, and a confirmation message.
-    print("\(newBorrower) was added")
+    print("""
+    
+    ----------------------------------------------------
+    \(newBorrower) 
+    ----------------------------------------------------
+    was added
+    """)
 
 }
 
@@ -552,7 +601,7 @@ func editBorrower(from borrowers: inout [Borrower]) {
     // Print a heading.
     print(
         """
-        Edit borrower details:
+        \nEdit borrower details:
         -------------------------
         """)
 
@@ -613,6 +662,7 @@ func searchBooks(books: [Book]) {
 
         // Print the details of each book from the results.
         for book in results {
+            print("----------------------------------------------------")
             print(book)
         }
     }
@@ -649,6 +699,7 @@ func searchBorrowers(borrowers: [Borrower]) {
 
         // Print the details of each borrower from the results.
         for borrower in results {
+            print("----------------------------------------------------")
             print(borrower)
         }
     }
@@ -665,13 +716,14 @@ func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
     // Print a heading.
     print(
         """
-        Loan history:
+        \nLoan history:
         ---------------
         """)
 
     // Print each the details of each loan record, sorted by loan ID.
     for loan in loans.sorted(by: { $0.id < $1.id }) {
         print(loan.loanDetails(books: books, borrowers: borrowers))
+        print("----------------------------------------------------")
     }
 }
 
@@ -775,7 +827,7 @@ struct SwiftPlayground {
 
             // Let the user enter the number of the option they want to select.
             let optionInput: String = input(
-                forNotNullString: "\nEnter option number, or 'done' to finish: ")
+                forNotNullString: "\nEnter option number, or 'done' to finish:")
 
             // If they the user is finished, end the program.
             if optionInput.lowercased() == "done" {
