@@ -327,11 +327,12 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
         let currentLoans: Int = borrower.currentLoans(loans: loans)
 
         // Print the borrower's details and their number of current loans.
-        print("""
-        \(borrower)
-        \(currentLoans) books on loan.
-        ----------------------------------------------------
-        """)
+        print(
+            """
+            \(borrower)
+            \(currentLoans) books on loan.
+            ----------------------------------------------------
+            """)
     }
 }
 
@@ -363,13 +364,14 @@ func addBook(to books: inout [Book]) {
     books.append(newBook)
 
     // Print the new book's details and confirmation that it was added.
-    print("""
+    print(
+        """
 
-    ----------------------------------------------------
-    \(newBook) 
-    ----------------------------------------------------
-    was added
-    """)
+        ----------------------------------------------------
+        \(newBook) 
+        ----------------------------------------------------
+        was added
+        """)
 
 }
 
@@ -402,13 +404,14 @@ func removeBook(from books: inout [Book]) {
         {
             // If there is, remove the book.
             books[IndexToRemove].exists = false
-            print("""
+            print(
+                """
 
-            ----------------------------------------------------
-            \(books[IndexToRemove]) 
-            ----------------------------------------------------
-            has been removed from the library.
-            """)
+                ----------------------------------------------------
+                \(books[IndexToRemove]) 
+                ----------------------------------------------------
+                has been removed from the library.
+                """)
 
             // If not, print an error message.
         } else {
@@ -511,12 +514,13 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         // Add the new loan to the loan records.
         loans.append(newLoan)
         // Print the new loan's details and a confirmation message.
-        print("""
+        print(
+            """
 
-        ----------------------------------------------------
-        \(newLoan.loanDetails(books: books, borrowers: borrowers))
-        ----------------------------------------------------
-        """)
+            ----------------------------------------------------
+            \(newLoan.loanDetails(books: books, borrowers: borrowers))
+            ----------------------------------------------------
+            """)
     }
 
 }
@@ -545,12 +549,13 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
         loans[indexToedit].returned = true
 
         // Print the details of the returned loan.
-        print("""
+        print(
+            """
 
-        ----------------------------------------------------
-        \(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
-        ----------------------------------------------------
-        """)
+            ----------------------------------------------------
+            \(loans[indexToedit].loanDetails(books: books, borrowers: borrowers))
+            ----------------------------------------------------
+            """)
 
         // If the book couldn't be returned, print an error message.
     } else {
@@ -583,13 +588,14 @@ func addBorrower(to borrowers: inout [Borrower]) {
     borrowers.append(newBorrower)
 
     // Print the new borrower's details, and a confirmation message.
-    print("""
-    
-    ----------------------------------------------------
-    \(newBorrower) 
-    ----------------------------------------------------
-    was added
-    """)
+    print(
+        """
+
+        ----------------------------------------------------
+        \(newBorrower) 
+        ----------------------------------------------------
+        was added
+        """)
 
 }
 
@@ -841,32 +847,60 @@ struct SwiftPlayground {
                     // Call the function of the corresponding option number,
                     // based on the menuOptionNumber enum.
                     switch optionNumber {
+
+                    // Call the viewBooks function.
                     case MenuOptionNumber.viewBooks.rawValue:
                         viewBooks(books: books, loans: loans)
+
+                    // Call the addBook function.
                     case MenuOptionNumber.addBook.rawValue:
                         addBook(to: &books)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the removeBook function.
                     case MenuOptionNumber.removeBook.rawValue:
                         removeBook(from: &books)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the borrowBook function.
                     case MenuOptionNumber.borrowBook.rawValue:
                         borrowBook(from: books, from: borrowers, to: &loans)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the returnBook function.
                     case MenuOptionNumber.returnBook.rawValue:
                         returnBook(to: &loans, books: books, borrowers: borrowers)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the viewBorrowers function.
                     case MenuOptionNumber.viewBorrowers.rawValue:
                         viewBorrowers(borrowers: borrowers, loans: loans)
+
+                    // Call the addBorrower function.
                     case MenuOptionNumber.addBorrower.rawValue:
                         addBorrower(to: &borrowers)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the editBorrower function.
                     case MenuOptionNumber.editBorrower.rawValue:
                         editBorrower(from: &borrowers)
+                        // Update the database.
                         updateDatabase()
+
+                    // Call the searchBooks function.
                     case MenuOptionNumber.searchBooks.rawValue:
                         searchBooks(books: books)
+
+                    // Call the searchBorrowers function.
                     case MenuOptionNumber.searchBorrowers.rawValue:
                         searchBorrowers(borrowers: borrowers)
+
+                    // Call the viewLoans function.
                     case MenuOptionNumber.viewLoans.rawValue:
                         viewLoans(loans: loans, books: books, borrowers: borrowers)
 
