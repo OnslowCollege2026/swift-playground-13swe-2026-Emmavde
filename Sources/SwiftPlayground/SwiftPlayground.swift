@@ -846,8 +846,11 @@ struct SwiftPlayground {
             let optionInput: String = input(
                 forNotNullString: "\nEnter option number, or 'done' to finish:")
 
-            // If they the user is finished, end the program.
+            // If the the user is finished, end the program.
             if optionInput.lowercased() == "done" {
+                // Print a goodbye message.
+                print("Thank you for visiting the library.")
+                // Stop looping.
                 running = false
             }
 
