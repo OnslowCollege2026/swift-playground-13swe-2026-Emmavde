@@ -1,5 +1,5 @@
 // Assessment Task:
-// school library book borrowing system
+// Library book borrowing system
 // Created 22/04/2026
 // Emma van den Eijkhoff
 
@@ -119,13 +119,28 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
 
 }
 
-/// A single option on the action menu option.
+/// A single option on the action menu.
 struct menuOption {
     // The option's number it is selected by.
-    let optionNumber: Int
+    let optionNumber: menuOptionNumber
 
     // The description of what action it performs.
     let description: String
+}
+
+// The possible option numbers for the action menu.
+enum menuOptionNumber: Int {
+    case viewBooks = 1
+    case addBook = 2
+    case removeBook = 3
+    case borrowBook = 4
+    case returnBook = 5
+    case viewBorrowers = 6
+    case addBorrower = 7
+    case editBorrower = 8
+    case searchBooks = 9
+    case searchBorrowers = 10
+    case viewLoans = 11
 }
 
 /// Gets user input in the form of a string.
@@ -207,8 +222,8 @@ func showActions() {
         """)
 
     // Print each option along with its option number in a list.
-    for option in actionOptions {
-        print("\(option.optionNumber). \(option.description)")
+    for option in menuOptions {
+        print("\(option.optionNumber.rawValue). \(option.description)")
     }
 }
 /// View all of the books in the library.
@@ -302,7 +317,7 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
 /// Add a book to the library.
 ///
 /// - Parameter books: The array of all the books in the library.
-func addBooks(to books: inout [Book]) {
+func addBook(to books: inout [Book]) {
 
     // Print a heading.
     print(
@@ -554,6 +569,8 @@ func editBorrower(from borrowers: inout [Borrower]) {
         // Change the borrower's name to the updated name.
         borrowers[indexToedit].name = newName
 
+        // Print a confirmation message.
+        print("Name updated.")
         // If no borrower of the given ID exists, print an error message.
     } else {
         print("There is no borrower with that ID.")
@@ -661,22 +678,20 @@ func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
 // The maximum amount in days the a loan can be taken out for.
 let maxLoanPeriod = 21
 
-// The different actions dispalyed in the option menu.
-let actionOptions: [menuOption] = [
-    menuOption(optionNumber: 1, description: "View books"),
-    menuOption(optionNumber: 2, description: "Add a book"),
-    menuOption(optionNumber: 3, description: "Remove a book"),
-    menuOption(optionNumber: 4, description: "Borrow a book"),
-    menuOption(optionNumber: 5, description: "return a book"),
-    menuOption(optionNumber: 6, description: "View borrowers"),
-    menuOption(optionNumber: 7, description: "Register a borrower"),
-    menuOption(optionNumber: 8, description: "Edit a borrower's details"),
-    menuOption(optionNumber: 9, description: "Search books"),
-    menuOption(optionNumber: 10, description: "Search Borrowers"),
-    menuOption(optionNumber: 11, description: "View loan records."),
+// The different actions displayed in the option menu.
+let menuOptions: [menuOption] = [
+    menuOption(optionNumber: .viewBooks, description: "View books"),
+    menuOption(optionNumber: .addBook, description: "Add a book"),
+    menuOption(optionNumber: .removeBook, description: "Remove a book"),
+    menuOption(optionNumber: .borrowBook, description: "Borrow a book"),
+    menuOption(optionNumber: .returnBook, description: "return a book"),
+    menuOption(optionNumber: .viewBorrowers, description: "View borrowers"),
+    menuOption(optionNumber: .addBorrower, description: "Register a borrower"),
+    menuOption(optionNumber: .editBorrower, description: "Edit a borrower's details"),
+    menuOption(optionNumber: .searchBooks, description: "Search books"),
+    menuOption(optionNumber: .searchBorrowers, description: "Search Borrowers"),
+    menuOption(optionNumber: .viewLoans, description: "View loan records."),
 ]
-
-
 
 @main
 struct SwiftPlayground {
@@ -720,23 +735,31 @@ struct SwiftPlayground {
             // If any of the fetching fails, print an error message.
         } catch { print("An error with the database occured. Error:\(error)") }
 
+        // Updates the database with any changes made to data in the program.
         func updateDatabase() {
             do {
                 try dbQueue.write { db in
 
+                    // For every book, if it is new or has been changed,
+                    // insert it or update its row in the database.
                     for book in books {
                         try book.save(db)
                     }
 
+                    // For every borrower, if it is new or has been changed,
+                    // insert it or update its row in the database.
                     for borrower in borrowers {
                         try borrower.save(db)
                     }
 
+                    // For every loan, if it is new or has been changed,
+                    // insert it or update its row in the database.
                     for loan in loans {
                         try loan.save(db)
                     }
                 }
 
+                // If an error occured, print the error and a message.
             } catch { print("An error with the database occured. Error:\(error)") }
 
         }
@@ -760,33 +783,40 @@ struct SwiftPlayground {
             }
 
             else {
-                // Convert the user's input into an integer, and call the function of the corresponding option number.
+                // Convert the user's input into an integer,
                 if let optionNumber = Int(optionInput) {
 
+                    // Call the function of the corresponding option number,
+                    // based on the menuOptionNumber enum.
                     switch optionNumber {
-                    case 1: viewBooks(books: books, loans: loans)
-                    case 2:
-                        addBooks(to: &books)
+                    case menuOptionNumber.viewBooks.rawValue:
+                        viewBooks(books: books, loans: loans)
+                    case menuOptionNumber.addBook.rawValue:
+                        addBook(to: &books)
                         updateDatabase()
-                    case 3:
+                    case menuOptionNumber.removeBook.rawValue:
                         removeBook(from: &books)
                         updateDatabase()
-                    case 4:
+                    case menuOptionNumber.borrowBook.rawValue:
                         borrowBook(from: books, from: borrowers, to: &loans)
                         updateDatabase()
-                    case 5:
+                    case menuOptionNumber.returnBook.rawValue:
                         returnBook(to: &loans, books: books, borrowers: borrowers)
                         updateDatabase()
-                    case 6: viewBorrowers(borrowers: borrowers, loans: loans)
-                    case 7:
+                    case menuOptionNumber.viewBorrowers.rawValue:
+                        viewBorrowers(borrowers: borrowers, loans: loans)
+                    case menuOptionNumber.addBorrower.rawValue:
                         addBorrower(to: &borrowers)
                         updateDatabase()
-                    case 8:
+                    case menuOptionNumber.editBorrower.rawValue:
                         editBorrower(from: &borrowers)
                         updateDatabase()
-                    case 9: searchBooks(books: books)
-                    case 10: searchBorrowers(borrowers: borrowers)
-                    case 11: viewLoans(loans: loans, books: books, borrowers: borrowers)
+                    case menuOptionNumber.searchBooks.rawValue:
+                        searchBooks(books: books)
+                    case menuOptionNumber.searchBorrowers.rawValue:
+                        searchBorrowers(borrowers: borrowers)
+                    case menuOptionNumber.viewLoans.rawValue:
+                        viewLoans(loans: loans, books: books, borrowers: borrowers)
 
                     // If the number wasn't an option, print an error message.
                     default: print("Invalid. Please enter a number from the menu, or 'done'.")
