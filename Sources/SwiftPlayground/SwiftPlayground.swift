@@ -1,7 +1,7 @@
 // Assessment Task:
-// Library book borrowing system
+// Library book borrowing system.
 // Created 22/04/2026
-// Emma van den Eijkhoff
+// Created by Emma van den Eijkhoff.
 
 import Foundation
 import GRDB
