@@ -17,11 +17,15 @@ struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord
     /// The Borrower's name.
     var name: String
 
+    /// The Borrower's age in years.
+    var age: Int
+
     /// The borrower's ID and name formated in a string.
     var description: String {
         """
         ID: \(id)
         Name: \(name)
+        Age: \(age)
         """
     }
 
@@ -36,6 +40,7 @@ struct Borrower: Identifiable, CustomStringConvertible, Codable, FetchableRecord
     enum CodingKeys: String, CodingKey {
         case id = "Borrower ID"
         case name = "Name"
+        case age = "Age"
     }
 
 }
@@ -582,8 +587,11 @@ func addBorrower(to borrowers: inout [Borrower]) {
     // Get input for the new borrower's name, looping until a name is given.
     let name: String = input(forNotNullString: "Enter the borrower's name: ")
 
+    // Get input for the new borrower's age, looping until a positive integer is given.
+    let age: Int = input(loopUntilPositiveIntGiven: "Enter the Borrower's age.")
+
     // Create the instance of the new borrower.
-    let newBorrower: Borrower = Borrower(id: id, name: name)
+    let newBorrower: Borrower = Borrower(id: id, name: name, age: age)
 
     // Add the new borrower to the library.
     borrowers.append(newBorrower)
@@ -619,14 +627,38 @@ func editBorrower(from borrowers: inout [Borrower]) {
     // Check if a borrower of that ID exists.
     if let indexToedit: Int = (borrowers.firstIndex(where: { $0.id == idToEdit })) {
 
-        // If they exist, get input for their updated name.
-        let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
+        // If they exist, get input on what property will be updated..
+        if let option: String = input(
+            forString: "Enter 'A' to change the age, or enter 'B' to change the name: "),
+            option.lowercased() == "a" || option.lowercased() == "b"
+        {
+            if option.lowercased() == "a" {
 
-        // Change the borrower's name to the updated name.
-        borrowers[indexToedit].name = newName
+                // Get input for the updated age, looping until a psoitve Integer is given.
+                let newAge: Int = input(loopUntilPositiveIntGiven: "Enter the borrower's updated age: ")
 
-        // Print a confirmation message.
-        print("Name updated.")
+                // Change the borrower's age to the updated age.
+                borrowers[indexToedit].age = newAge
+
+                // Print a confirmation message.
+                print("Age updated.")
+            }
+
+            if option.lowercased() == "b" {
+
+                let newName: String = input(forNotNullString: "Enter the borrower's updated name: ")
+
+                // Change the borrower's name to the updated name.
+                borrowers[indexToedit].name = newName
+
+                // Print a confirmation message.
+                print("Name updated.")
+            }
+
+        } else {
+            print("Please enter 'A' or 'B'.")
+        }
+
         // If no borrower of the given ID exists, print an error message.
     } else {
         print("There is no borrower with that ID.")
