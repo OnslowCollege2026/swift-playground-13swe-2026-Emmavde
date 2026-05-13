@@ -248,6 +248,17 @@ func showActions() {
 ///   - books: The array of all books in the library.
 ///   - loans: The array of all loan history.
 func viewBooks(books: [Book], loans: [Loan]) {
+
+    // Check if there are any books in the library.
+    if books.isEmpty {
+        print("""
+        \(divider)
+        There are no books in the library.
+        \(divider)
+        """)
+        return
+    }
+
     // Print the user's view options.
     print(
         """
@@ -314,6 +325,16 @@ func viewBooks(books: [Book], loans: [Loan]) {
 ///   - borrowers: The array of all borrowers in the library.
 ///   - loans: The array of all the loans in the library.
 func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
+
+        // Check if there are any borrowers in the library.
+    if borrowers.isEmpty {
+        print("""
+        \(divider)
+        There are no borrowers in the library.
+        \(divider)
+        """)
+        return
+    }
 
     print(
         """
@@ -730,6 +751,14 @@ func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
         \nLoan history:
         \(divider)
         """)
+
+    // Check if there are any loans in the system.
+    if loans.isEmpty {
+        print("""
+        There are no loans records in the system.
+        """)
+        return
+    }
 
     // Print each the details of each loan record, sorted by loan ID.
     for loan in loans.sorted(by: { $0.id < $1.id }) {
