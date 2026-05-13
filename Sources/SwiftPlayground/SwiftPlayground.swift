@@ -133,7 +133,6 @@ struct Loan: Identifiable, Codable, FetchableRecord, PersistableRecord {
         case loanPeriod = "Loan Period"
         case returned = "Returned"
     }
-
 }
 
 /// A single option on the action menu.
@@ -220,7 +219,7 @@ func input(loopUntilPositiveIntGiven prompt: String) -> Int {
     while true {
         // Allow the user to enter an input.
         if let userInput = input(forInt: prompt), userInput > 0 {
-            // Rteurn that input and stop looping if an Int is given.
+            // Return that input and stop looping if an Int is given.
             return userInput
         }
         // Otherwise print an error message and keep looping.
@@ -256,29 +255,27 @@ func viewBooks(books: [Book], loans: [Loan]) {
         B. View available books.
         """)
 
-    // An empty array for the filtered books.
     var filteredBooks: [Book] = []
 
-    // A varaiable that controls the input loop.
     var looping: Bool = true
-    // Loop until a valid input is given.
+
+    // Loop until the user gives a valid option input.
     while looping {
 
-        // Ask the user's option choice.
         let optionInput: String = input(forNotNullString: "Please enter the option letter: ")
 
-        // If the user enter 'a'
         if optionInput.lowercased() == "a" {
+
             // Filter for only the existing books.
             filteredBooks = books.filter({ $0.exists })
-            // Stop looping.
             looping = false
-            // If the user enter 'b'
+
         } else if optionInput.lowercased() == "b" {
+
             // Filter for books that exist and are currently available.
             filteredBooks = books.filter({ $0.exists && $0.isAvailable(loans: loans) })
-            // Stop looping
             looping = false
+
             // If input is invalid, print an error message and continue looping.
         } else {
             print("Invalid. Enter 'a' or 'b'.")
@@ -318,7 +315,6 @@ func viewBooks(books: [Book], loans: [Loan]) {
 ///   - loans: The array of all the loans in the library.
 func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
 
-    // Print a heading.
     print(
         """
         \nBorrowers list:
@@ -346,7 +342,6 @@ func viewBorrowers(borrowers: [Borrower], loans: [Loan]) {
 /// - Parameter books: The array of all the books in the library.
 func addBook(to books: inout [Book]) {
 
-    // Print a heading.
     print(
         """
         \nAdd a book:
@@ -368,7 +363,6 @@ func addBook(to books: inout [Book]) {
     // Add the new book to the library.
     books.append(newBook)
 
-    // Print the new book's details and confirmation that it was added.
     print(
         """
 
@@ -380,12 +374,11 @@ func addBook(to books: inout [Book]) {
 
 }
 
-/// Remove a boomk from the library.
+/// Remove a book from the library.
 ///
 /// - Parameter books:The array of all the books in the library.
 func removeBook(from books: inout [Book]) {
 
-    // Print a heading.
     print(
         """
         \nRemove a book:
@@ -434,7 +427,6 @@ func removeBook(from books: inout [Book]) {
 ///   - borrowers: The array of all the borrowers of the library.
 ///   - loans: The array of all loan records that the new loan is added to.
 func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout [Loan]) {
-    // Print a heading.
     print(
         """
         \nBorrow a book:
@@ -443,19 +435,19 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
     // If there are no available books in the library, tell the user.
     if books.filter({ $0.isAvailable(loans: loans) }).isEmpty {
-        print("""
-        Unfortunately there are no books available to borrow. Please add or return some books.
-        """)
-    } 
+        print(
+            """
+            Unfortunately there are no books available to borrow. Please add or return some books.
+            """)
+    }
 
     // If there are no borrowers in the library, tell the user.
     if borrowers.isEmpty {
-        print("""
-        There are no borrowers registered with the library. Please register some borrowers. 
-        """)
-    }
-    
-    else {
+        print(
+            """
+            There are no borrowers registered with the library. Please register some borrowers. 
+            """)
+    } else {
 
         // Make the ID of the new loan 1 more than the current highest ID number.
         let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
@@ -477,11 +469,13 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
         // repeating until a positive number is given.
         let bookId: Int = input(
             loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
+
         // Check if there exists a book of this ID, and it is available.
         guard let bookToBorrow = books.first(where: { $0.id == bookId }),
             bookToBorrow.exists,
             bookToBorrow.isAvailable(loans: loans)
         else {
+            // If the book cannot be borrowed, return to the main menu.
             print("No book of this ID exists, or the book is currently unavailable.")
             return
         }
@@ -510,7 +504,6 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
         // Add the new loan to the loan records.
         loans.append(newLoan)
-        // Print the new loan's details and a confirmation message.
         print(
             """
 
@@ -519,7 +512,6 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
             \(divider)
             """)
     }
-
 }
 
 /// Return a book to the library.
@@ -529,7 +521,6 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 ///   - books: The array of all books in the library.
 func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
 
-    // Print a heading.
     print(
         """
         \nReturn a book:
@@ -565,7 +556,6 @@ func returnBook(to loans: inout [Loan], books: [Book], borrowers: [Borrower]) {
 /// - Parameter borrowers: The array of all borrowers of the library.
 func addBorrower(to borrowers: inout [Borrower]) {
 
-    // Print a heading.
     print(
         """
         \nRegister a borrower:
@@ -587,7 +577,6 @@ func addBorrower(to borrowers: inout [Borrower]) {
     // Add the new borrower to the library.
     borrowers.append(newBorrower)
 
-    // Print the new borrower's details, and a confirmation message.
     print(
         """
 
@@ -604,7 +593,6 @@ func addBorrower(to borrowers: inout [Borrower]) {
 /// - Parameter borrowers: The array of all borrrower's of the library.
 func editBorrower(from borrowers: inout [Borrower]) {
 
-    // Print a heading.
     print(
         """
         \nEdit borrower details:
@@ -632,7 +620,6 @@ func editBorrower(from borrowers: inout [Borrower]) {
                 // Change the borrower's age to the updated age.
                 borrowers[indexToedit].age = newAge
 
-                // Print a confirmation message.
                 print("Age updated.")
             }
 
@@ -643,7 +630,6 @@ func editBorrower(from borrowers: inout [Borrower]) {
                 // Change the borrower's name to the updated name.
                 borrowers[indexToedit].name = newName
 
-                // Print a confirmation message.
                 print("Name updated.")
             }
 
@@ -663,7 +649,6 @@ func editBorrower(from borrowers: inout [Borrower]) {
 /// - Parameter books: The array of all the books in the library.
 func searchBooks(books: [Book]) {
 
-    // Print a heading.
     print(
         """
         \nSearch for books:
@@ -679,6 +664,7 @@ func searchBooks(books: [Book]) {
 
     // Create an array of results for the search.
     let results: [Book] = books.filter {
+
         // Add existing books to the array if their title or author name contain the keyword.
         ($0.title.lowercased().contains(keyword) || $0.author.lowercased().contains(keyword))
             && $0.exists
@@ -688,6 +674,7 @@ func searchBooks(books: [Book]) {
     if results.isEmpty {
         print("No books contain that keyword.")
     } else {
+
         // Display the number of book results found.
         print("\(results.count) results found:\n")
 
@@ -704,7 +691,6 @@ func searchBooks(books: [Book]) {
 /// - Parameter borrowers:
 func searchBorrowers(borrowers: [Borrower]) {
 
-    // Print a heading.
     print(
         """
         \nSearch for borrowers:
@@ -717,6 +703,7 @@ func searchBorrowers(borrowers: [Borrower]) {
 
     // Create an array of search results.
     let results: [Borrower] = borrowers.filter {
+
         // Add a borrower to the results if their name contains the keyword.
         ($0.name.lowercased().contains(keyword))
     }
@@ -744,7 +731,6 @@ func searchBorrowers(borrowers: [Borrower]) {
 ///   - borrowers: The array of all borrower's of the library.
 func viewLoans(loans: [Loan], books: [Book], borrowers: [Borrower]) {
 
-    // Print a heading.
     print(
         """
         \nLoan history:
@@ -800,20 +786,17 @@ struct SwiftPlayground {
         var loans: [Loan] = []
 
         do {
-            // Fetch all of the data from the Books table,
-            // and add it to the books array.
+            // Fetch all of the data from the Books table, and add it to the books array.
             books = try dbQueue.read { db in
                 try Book.fetchAll(db)
             }
 
-            // Fetch all of the data from the Borrowers table,
-            // and add it to the borrowers array.
+            // Fetch all of the data from the Borrowers table, and add it to the borrowers array.
             borrowers = try dbQueue.read { db in
                 try Borrower.fetchAll(db)
             }
 
-            // Fetch all of the data from the Loans table,
-            // and add it to the loans array.
+            // Fetch all of the data from the Loans table, and add it to the loans array.
             loans = try dbQueue.read { db in
                 try Loan.fetchAll(db)
             }
@@ -849,7 +832,6 @@ struct SwiftPlayground {
             } catch { print("An error with the database occured. Error:\(error)") }
         }
 
-        // Print a welcome message.
         print(
             """
              --------------------------------
@@ -857,7 +839,6 @@ struct SwiftPlayground {
             -------------------------------
             """)
 
-        // A variable that controls the main loop.
         var running: Bool = true
 
         // Loop until the user stops the program.
@@ -872,9 +853,7 @@ struct SwiftPlayground {
 
             // If the the user is finished, end the program.
             if optionInput.lowercased() == "done" {
-                // Print a goodbye message.
                 print("Thank you for visiting the library.")
-                // Stop looping.
                 running = false
             }
 
@@ -886,59 +865,48 @@ struct SwiftPlayground {
                     // based on the menuOptionNumber enum.
                     switch optionNumber {
 
-                    // Call the viewBooks function.
                     case MenuOptionNumber.viewBooks.rawValue:
                         viewBooks(books: books, loans: loans)
 
-                    // Call the addBook function.
                     case MenuOptionNumber.addBook.rawValue:
                         addBook(to: &books)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the removeBook function.
                     case MenuOptionNumber.removeBook.rawValue:
                         removeBook(from: &books)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the borrowBook function.
                     case MenuOptionNumber.borrowBook.rawValue:
                         borrowBook(from: books, from: borrowers, to: &loans)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the returnBook function.
                     case MenuOptionNumber.returnBook.rawValue:
                         returnBook(to: &loans, books: books, borrowers: borrowers)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the viewBorrowers function.
                     case MenuOptionNumber.viewBorrowers.rawValue:
                         viewBorrowers(borrowers: borrowers, loans: loans)
 
-                    // Call the addBorrower function.
                     case MenuOptionNumber.addBorrower.rawValue:
                         addBorrower(to: &borrowers)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the editBorrower function.
                     case MenuOptionNumber.editBorrower.rawValue:
                         editBorrower(from: &borrowers)
                         // Update the database.
                         updateDatabase()
 
-                    // Call the searchBooks function.
                     case MenuOptionNumber.searchBooks.rawValue:
                         searchBooks(books: books)
 
-                    // Call the searchBorrowers function.
                     case MenuOptionNumber.searchBorrowers.rawValue:
                         searchBorrowers(borrowers: borrowers)
 
-                    // Call the viewLoans function.
                     case MenuOptionNumber.viewLoans.rawValue:
                         viewLoans(loans: loans, books: books, borrowers: borrowers)
 
