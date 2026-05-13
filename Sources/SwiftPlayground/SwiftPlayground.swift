@@ -389,14 +389,8 @@ func removeBook(from books: inout [Book]) {
     // Loop until a valid input is given.
     while true {
 
-        // Get input for the ID number of the book, if it is valid, stop looping.
-        guard let idToRemove = input(forInt: "Enter the ID number of the book to delete: "),
-            idToRemove > 0
-        else {
-            // If the ID is not a positive integer, display an error message and continue looping.
-            print("Please enter a valid ID number.\n")
-            continue
-        }
+        // Get input for the ID number of the book,looping until a valid input is given..
+        let idToRemove: Int = input(loopUntilPositiveIntGiven: "Enter the ID number of the book to delete: ")
 
         // Check if there is an existing book of the given ID.
         if let IndexToRemove: Int = (books.firstIndex(where: { $0.id == idToRemove && $0.exists }))
