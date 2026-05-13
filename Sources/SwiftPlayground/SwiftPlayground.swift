@@ -443,56 +443,47 @@ func borrowBook(from books: [Book], from borrowers: [Borrower], to loans: inout 
 
     // If there are no available books in the library, tell the user.
     if books.filter({ $0.isAvailable(loans: loans) }).isEmpty {
-        print("Unfortunately all books are on loan. ")
-    } else {
+        print("""
+        Unfortunately there are no books available to borrow. Please add or return some books.
+        """)
+    } 
+
+    // If there are no borrowers in the library, tell the user.
+    if borrowers.isEmpty {
+        print("""
+        There are no borrowers registered with the library. Please register some borrowers. 
+        """)
+    }
+    
+    else {
 
         // Make the ID of the new loan 1 more than the current highest ID number.
         let loanId: Int = (loans.map { $0.id }.max() ?? 0) + 1
 
-        // Initalisation of the borrower ID for the new loan.
-        var borrowerId: Int = 0
-
-        // Initalisation of the book ID for the new loan.
-        var bookId: Int = 0
-
         // Initalisation of the loan period for the new loan.
         var loanPeriod: Int = 0
 
-        // Loop until a valid Borrower ID is given.
-        while true {
-            // Ask the user for their borrower ID.
-            let id: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
-            // If there exists a borrower of that ID, stop looping
-            if borrowers.contains(where: { $0.id == id }) {
-                // Assign the borrower ID of the new loan as the user's input.
-                borrowerId = id
-                break
-                // If not borrower of this ID exists, keep looping.
-            } else {
-                print("No borrower of this ID exists.")
-            }
+        // Ask the user for their borrower ID.
+        let borrowerId: Int = input(loopUntilPositiveIntGiven: "Enter your Borrower ID: ")
+
+        // Check that the borrower exists.
+        guard borrowers.contains(where: { $0.id == borrowerId }) else {
+            // If no borrower of this ID exists, return to the menu.
+            print("No borrower of this ID exists.")
+            return
         }
 
-        // Loop until a valid Book ID is given.
-        while true {
-            // Ask the user for the ID of the book they want to borrow,
-            // repeating until a positve number is given.
-            let id: Int = input(
-                loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
-
-            // Check if there exists a book of this ID, and it is avalailable.
-            if let bookToBorrow = books.first(where: { $0.id == id }),
-                bookToBorrow.exists,
-                bookToBorrow.isAvailable(loans: loans)
-            {
-                // If there is, assign the borrower ID of the new loan as the user's input.
-                bookId = id
-                // Stop looping.
-                break
-                // Otherwise, print an error message, and keep looping.
-            } else {
-                print("No book of this ID exists, or the book is currently unavialable.")
-            }
+        // Ask the user for the ID of the book they want to borrow,
+        // repeating until a positive number is given.
+        let bookId: Int = input(
+            loopUntilPositiveIntGiven: "Enter the ID of the book you wish to borrow: ")
+        // Check if there exists a book of this ID, and it is available.
+        guard let bookToBorrow = books.first(where: { $0.id == bookId }),
+            bookToBorrow.exists,
+            bookToBorrow.isAvailable(loans: loans)
+        else {
+            print("No book of this ID exists, or the book is currently unavailable.")
+            return
         }
 
         // Loop until a valid loan period is given.
@@ -635,7 +626,8 @@ func editBorrower(from borrowers: inout [Borrower]) {
             if option.lowercased() == "a" {
 
                 // Get input for the updated age, looping until a psoitve Integer is given.
-                let newAge: Int = input(loopUntilPositiveIntGiven: "Enter the borrower's updated age: ")
+                let newAge: Int = input(
+                    loopUntilPositiveIntGiven: "Enter the borrower's updated age: ")
 
                 // Change the borrower's age to the updated age.
                 borrowers[indexToedit].age = newAge
